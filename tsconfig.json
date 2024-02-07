@@ -1,10 +1,17 @@
 {
     "compilerOptions": {
+        "declaration": true,
+        "outDir": "./dist",
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "esModuleInterop": true,
         "target": "es6",
         "module": "CommonJS",
         "strict": true,
         "inlineSourceMap": true,
         "inlineSources": true,
         "noImplicitAny": true
-    }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "**/*.spec.ts", "./dist"]
 }

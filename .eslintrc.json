@@ -1,9 +1,20 @@
 {
+    "ignorePatterns": [".eslintrc.js", "jest.config.js", "*.js"], // Please don't lint these files...
     "env": {
+        "browser": true,
         "es2021": true,
         "node": true
     },
-    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+    "files": ["*.ts"],
+    
+    // This rule set correspond quite well to the style guide used in the PKD course
+    "extends": [
+        "airbnb-base",
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/typescript",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -11,6 +22,30 @@
     },
     "plugins": ["@typescript-eslint"],
     "rules": {
+
+        // makes "I am " + age + " years old" possible for combining number with string
+        "@typescript-eslint/restrict-plus-operands": "off",
+
+        // end line with semicolons
+        "@typescript-eslint/semi": "error",
+
+        // if the type is "obvious" to the compiler, you may as well skip the type declaration
+        "@typescript-eslint/no-inferrable-types": "warn",
+
+        // all functions must have explicit return types
+        "@typescript-eslint/explicit-function-return-type": "error",
+
+        // do put a blankspace before curly braces (e.g. in function definitions and if-else-clauses
+        "@typescript-eslint/space-before-blocks": "warn",
+
+        // use correct naming conventions
+        "@typescript-eslint/naming-convention": ["error",
+        { "selector": "default", "format": ["snake_case"] },
+        { "selector": "typeLike", "format": ["PascalCase"] }
+        ],
+
+        // use Array<T> rather than T[]
+        "@typescript-eslint/array-type": ["error", { "default": "generic" }],
         "no-const-assign": "error",
         "no-dupe-args": "error",
         "no-dupe-keys": "error",
@@ -27,7 +62,7 @@
         "no-empty": "warn",
         "no-unneeded-ternary": "warn",
         "yoda": ["error", "never", {"exceptRange": true}],
-        "line-comment-position": ["warn", {"position": "above"}],
+        // "line-comment-position": ["warn", {"position": "above"}],
         "comma-dangle": ["error", "never"],
         "semi-spacing": ["error", {"before": false, "after": true}],
         "space-before-function-paren": ["error", "never"],

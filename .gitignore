@@ -1,5 +1,22 @@
-# Ignore lib/ files that was downloaded from course page.
-lib/**
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Bundle
+dist/
+
+# NPM package lock
+package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 .git/*
 
@@ -11,7 +28,7 @@ coverage/**
 **/*.map
 
 # Do not track personal workspace files
-#.vscode/*
+.vscode/*
 
 # Do not track MacOS Files
 .DS_Store
