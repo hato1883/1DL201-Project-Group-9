@@ -1,0 +1,59 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+        {
+            // Windows specifc tsc.cmd command
+            "label": "tsc: watch - Windows",
+            "type": "shell",
+            "group": "build",
+            "problemMatcher": [
+                "$tsc-watch"
+            ],
+            "command": "tsc.cmd -p ${fileWorkspaceFolder}/tsconfig.json --watch",
+            "isBackground": true,
+            
+        },
+
+        // "tsc: watch - osx" This task is not recoginized by vscode.
+        // might be becuse it being duplicate of "tsc: watch - Linux"
+        {
+            "label": "tsc: watch - osx",
+            "type": "typescript",
+            "tsconfig": "tsconfig.json",
+            "option": "watch",
+            "problemMatcher": [
+                "$tsc-watch"
+            ],
+            "group": "build",
+        },
+        {
+            "label": "tsc: watch - Linux",
+            "type": "typescript",
+            "tsconfig": "tsconfig.json",
+            "option": "watch",
+            "problemMatcher": [
+                "$tsc-watch"
+            ],
+            "group": "build",
+        },
+        {
+            "label": "cleanUp",
+            "group": "build",
+            "type": "shell",
+            // Linux / MacOS x can use rm
+            "command": "rm ${fileDirname}/${fileBasenameNoExtension}.js ${fileDirname}/${fileBasenameNoExtension}.js.map",
+            // windows needs powershell which uses del
+            "windows":{
+                "command": "del ${fileDirname}/${fileBasenameNoExtension}.js ${fileDirname}/${fileBasenameNoExtension}.js.map"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            }
+        }
+    ]
+}

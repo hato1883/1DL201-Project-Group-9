@@ -1,0 +1,9 @@
+{
+    "transform": {
+        "^.+\\.ts?$": "ts-jest"
+    },
+    "testRegex": ".*(.test.ts)",
+    "testEnvironment": "node",
+    "preset": "ts-jest",
+    "collectCoverage": true
+}

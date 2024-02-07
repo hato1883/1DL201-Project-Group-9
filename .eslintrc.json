@@ -1,0 +1,40 @@
+{
+    "env": {
+        "es2021": true,
+        "node": true
+    },
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": ["@typescript-eslint"],
+    "rules": {
+        "no-const-assign": "error",
+        "no-dupe-args": "error",
+        "no-dupe-keys": "error",
+        "no-duplicate-case": "error",
+        "no-duplicate-imports": "warn",
+        "no-unreachable": "warn",
+        "curly": ["error", "multi-line"],
+        "default-case": "error",
+        "default-case-last": "error",
+        "default-param-last": ["error"],
+        "eqeqeq": ["error", "smart"],
+        "max-depth": ["warn", 4],
+        "no-else-return": ["error", {"allowElseIf": false}],
+        "no-empty": "warn",
+        "no-unneeded-ternary": "warn",
+        "yoda": ["error", "never", {"exceptRange": true}],
+        "line-comment-position": ["warn", {"position": "above"}],
+        "comma-dangle": ["error", "never"],
+        "semi-spacing": ["error", {"before": false, "after": true}],
+        "space-before-function-paren": ["error", "never"],
+        "spaced-comment": ["error", "always"],
+        "indent": ["warn", 4, {"ignoredNodes": ["ConditionalExpression"]}],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["warn", "double"],
+        "semi": ["error", "always"]
+    }
+}

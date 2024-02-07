@@ -1,0 +1,4 @@
+# Ignore lib/ files that was downloaded from course page.
+# as they will not follow our style.
+lib/**
+

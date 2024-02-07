@@ -1,0 +1,51 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Launch .js file
+            "name": "Launch Program",
+            "type": "node",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+
+            // Path to file current selected file but with `.js` exstension
+            "program": "${fileDirname}/${fileBasenameNoExtension}.js",
+
+            // Output
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ],
+
+            // Use "DEBUG CONSOLE" for output, cleaner then "integratedTerminal",
+            // but might cause issues with user inputs later
+            "console": "internalConsole",
+
+            // Sets focus to "DEBUG CONSOLE" Which has the output of given file
+            "internalConsoleOptions": "openOnSessionStart",
+
+            //"postDebugTask": "cleanUp",
+
+            // Complie task used when on Windows OS
+            "windows": {
+                "preLaunchTask": "tsc: watch - Windows"
+            },
+
+            // Complie task used when on MacOS 
+            "osx": {
+                // task "tsc: watch - osx" can not be found in tasks.json due to unkown error
+                // Using Linux task as they are duplicate
+                "preLaunchTask": "tsc: watch - Linux"
+            },
+
+            // Complie task used when on Linux
+            "linux": {
+                "preLaunchTask": "tsc: watch - Linux"
+            } 
+        }
+    ]
+}
