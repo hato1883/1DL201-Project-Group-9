@@ -13,6 +13,6 @@
         //"inlineSources": true,
         "noImplicitAny": true
     },
-    "include": ["../src/**/*"],
-    "exclude": ["../node_modules", "../**/*.spec.ts", "../dist"]
+    "include": ["./src/**/*"],
+    "exclude": ["./node_modules", "./**/*.spec.ts", "./dist"]
 }
