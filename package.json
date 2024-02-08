@@ -2,19 +2,8 @@
     "version": "1.0.0",
     "main": "./src/app.ts",
     "scripts": {
-        "npm-reset": "rm -rf node_modules && npm cache verify && npm i",
-        "git-reset": "git reset HEAD --hard && git clean -fd && git fetch --all --tags --prune && git pull",
-        "start": "webpack serve",
-        "build": "webpack"
+        "dev": "webpack-dev-server"
     },
-    "keywords": [
-        "pixijs",
-        "playground",
-        "basic",
-        "webpack",
-        "typescript",
-        "seed"
-    ],
     "dependencies": {
         "pixi.js": "^7.4.0",
         "typescript": "^5.3.3",

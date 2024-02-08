@@ -5,6 +5,9 @@ node_modules/
 # Optional npm cache directory
 .npm
 
+# Track this config file.
+!config/*
+
 # Bundle
 dist/
 

@@ -84,7 +84,7 @@ module.exports = {
         extensions: [".ts", ".js"]
     },
     devServer: {
-        open: true,
+        open: false,
         allowedHosts: "all",
         headers: {
             "Access-Control-Allow-Origin": "*",
