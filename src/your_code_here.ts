@@ -1,5 +1,5 @@
 // Example of some function we want to test
-export function isTwo(arg: number): boolean {
+export function is_two(arg: number): boolean {
     if (arg === 2) {
         return true;
     } else {

@@ -1,0 +1,349 @@
+{
+  "ignorePatterns": [".eslintrc.js", "jest.config.js", "*.js"], // Please don't lint these files...
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+
+  // This rule set correspond quite well to the style guide used in the PKD course
+  "extends": [
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["@stylistic", "@typescript-eslint/eslint-plugin"],
+  "rules": {
+    // makes "I am " + age + " years old" possible for combining number with string
+    "@stylistic/restrict-plus-operands": "off",
+
+    // if the type is "obvious" to the compiler, you may as well skip the type declaration
+    "@typescript-eslint/no-inferrable-types": "warn",
+
+    // all functions must have explicit return types
+    "@typescript-eslint/explicit-function-return-type": "error",
+
+    // use correct naming conventions
+    "@typescript-eslint/naming-convention": [
+      "error",
+      { "selector": "default", "format": ["snake_case"] },
+      { "selector": "typeLike", "format": ["PascalCase"] },
+      { "selector": "objectLiteralProperty", "format": null }
+    ],
+
+    // use Array<T> rather than T[]
+    "@typescript-eslint/array-type": ["error", { "default": "generic" }],
+
+    // Consistancy in Array brackets (see https://eslint.style/rules/default/array-bracket-newline)
+    "@stylistic/array-bracket-newline": ["error", "consistent"],
+
+    // Consistant spacning in Arrays [1, 2, 3] instead of [ 1, 2, 3 ].
+    // (see https://eslint.style/rules/default/array-bracket-spacing for more)
+    "@stylistic/array-bracket-spacing": ["error", "never"],
+
+    // Consistant spacning in Arrays [1, 2, 3] instead of [ 1, 2, 3 ].
+    // (see https://eslint.style/rules/default/array-bracket-spacing for more)
+    "@stylistic/array-element-newline": ["error", "consistent"],
+
+    // Forces usage of parentheses around lambda arguments, such as (a) => a; and (a) => {a;} instead of a => a and a => {a}.
+    // (see https://eslint.style/rules/default/arrow-parens for more)
+    "@stylistic/arrow-parens": ["error", "always"],
+
+    // Forces spacing before and after the arrow in a lambda such as (a) => a; instead of (a)=> a; or (a) =>a; or (a)=>a;.
+    // (see https://eslint.style/rules/default/arrow-spacing for more)
+    "@stylistic/arrow-spacing": "error",
+
+    // Forces space padding in culry blocks of code  such as { (a) => a; } instead of { (a)=> a;} or {(a) =>a; } or {(a)=>a};.
+    // (see https://eslint.style/rules/default/block-spacing for more)
+    "@stylistic/block-spacing": "error",
+
+    // Forces curly brace position.
+    // (see https://eslint.style/rules/default/brace-style for more)
+    "@stylistic/brace-style": "error",
+
+    // Bans trailing comma.
+    // (see https://eslint.style/rules/default/comma-dangle for more)
+    "@stylistic/comma-dangle": ["error", "never"],
+
+    // Enforce a consistant comma spacing.
+    // (see https://eslint.style/rules/default/comma-spacing for more)
+    "@stylistic/comma-spacing": ["error", { "before": false, "after": true }],
+
+    // Forces comma to be at the end of preceding element (same line).
+    // (see https://eslint.style/rules/default/comma-style for more)
+    "@stylistic/comma-style": ["error", "last"],
+
+    // Ensures there are no spaces when indexing, such as array[0] is ok but not array[ 0 ] or array[ 0] or array[0 ]m etc.
+    // (see https://eslint.style/rules/default/computed-property-spacing for more)
+    "@stylistic/computed-property-spacing": ["error", "never"],
+
+    // Where a dot should be when accsessing objects.
+    // (see https://eslint.style/rules/default/dot-location for more)
+    "@stylistic/dot-location": ["error", "property"],
+
+    // Forces Empty line at end of each file.
+    // (see https://eslint.style/rules/default/eol-last for more)
+    "@stylistic/eol-last": ["error", "always"],
+
+    // Set a max number of consecutive empty lines.
+    // (see https://eslint.style/rules/default/no-multiple-empty-lines for more)
+    "@stylistic/no-multiple-empty-lines": [
+      "error",
+      { "max": 2, "maxBOF": 0, "maxEOF": 1 }
+    ],
+
+    // No traling whitespace except for in comments
+    // (see hhttps://eslint.style/rules/default/no-trailing-spaces for more)
+    "@stylistic/no-trailing-spaces": ["error", { "ignoreComments": true }],
+
+    // No spaces between function name and parentheses.
+    // (see https://eslint.style/rules/default/function-call-spacing for more)
+    "@stylistic/function-call-spacing": ["error", "never"],
+
+    // Consistant line breaks in function call arguments
+    // (see https://eslint.style/rules/default/function-call-argument-newline for more)
+    "@stylistic/function-call-argument-newline": ["error", "consistent"],
+
+    // Rule for function parentheses placement.
+    // (see https://eslint.style/rules/default/function-paren-newline for more)
+    "@stylistic/function-paren-newline": ["error", "multiline-arguments"],
+
+    // Keep small lambda functions inline with parameter decleration.
+    // (see https://eslint.style/rules/default/implicit-arrow-linebreak for more)
+    "@stylistic/implicit-arrow-linebreak": ["error", "beside"],
+
+    // Spacing rule.
+    // (see https://eslint.style/rules/default/indent for more)
+    "@stylistic/indent": [
+      "error",
+      4, // error if indent is not a multiple of 4, unless...
+      {
+        "ignoredNodes": ["ConditionalExpression"], // it is a conditional expression,
+        "FunctionDeclaration": { "parameters": "first" }, // it is a function paramter that should be inline with the first
+        "FunctionExpression": { "parameters": "first" }, // it is a function paramter that should be inline with the first
+        "CallExpression": { "arguments": "first" }, // it is a function call with arguments that should be inline with the first
+        "ArrayExpression": "first", // it is a elemnt in a array, then align with frist element
+        "ObjectExpression": "first", // it is a multiline object expression in that case align with frist
+        "flatTernaryExpressions": true, // it is a tenary then keep it flat.
+        "offsetTernaryExpressions": true, // it is a tenerary then ofset is child block code
+        "ignoreComments": true // it is a comment then let i float where it is.
+      }
+    ],
+
+    // Spacing rule for binary opperations.
+    // (see https://eslint.style/rules/default/indent-binary-ops for more)
+    "@stylistic/indent-binary-ops": ["error", 4],
+
+    // Spacing rule : opperations (key setting).
+    // (see https://eslint.style/rules/default/key-spacing for more)
+    "@stylistic/key-spacing": [
+      "error", // exit code 1
+      {
+        "beforeColon": false, // no space before key-name and colon
+        "afterColon": true, // space after colon and value
+        "mode": "strict"
+      } // must be exactly 1 space
+    ],
+
+    // Spacing rule keywords such as if, while, else, etc...
+    // (see https://eslint.style/rules/default/keyword-spacing for more)
+    "@stylistic/keyword-spacing": ["error", { "after": true }],
+
+    // Linebreak style to use.
+    // (see https://eslint.style/rules/default/linebreak-style for more)
+    "@stylistic/linebreak-style": ["error", "unix"],
+
+    // Comment line spacing before and after
+    // (see https://eslint.style/rules/default/lines-around-comment for more)
+    "@stylistic/lines-around-comment": [
+      "error",
+      {
+        "beforeBlockComment": true,
+        "beforeLineComment": true,
+        "allowClassStart": true,
+        "allowBlockStart": true,
+        "allowObjectStart": true
+      }
+    ],
+
+    // Spacing rule for Class structures.
+    // (see https://eslint.style/rules/default/lines-between-class-members for more)
+    "@stylistic/lines-between-class-members": [
+      "error",
+      {
+        "enforce": [
+          { "blankLine": "never", "prev": "field", "next": "field" }, // no line spaciong between fields
+          { "blankLine": "always", "prev": "*", "next": "method" } // spacing between anything and methods
+        ]
+      }
+    ],
+
+    // Warn user when code is getting to long.
+    // (see https://eslint.style/rules/default/max-len for more)
+    "@stylistic/max-len": ["warn", { "code": 80 }],
+
+    // Semicolon after each delimiter in interfaces.
+    // (see https://eslint.style/rules/default/member-delimiter-style for more)
+    "@stylistic/member-delimiter-style": "error",
+
+    // Max one statment per line.
+    // (see https://eslint.style/rules/default/max-statements-per-line for more)
+    "@stylistic/max-statements-per-line": ["error", { "max": 1 }],
+
+    // If you are using multilined ternary then be consistant with it.
+    // (see https://eslint.style/rules/default/multiline-ternary for more)
+    "@stylistic/multiline-ternary": ["error", "always-multiline"],
+
+    // If you using new keyword than create objet with parentheses such as new Object() instead of new Object.
+    // (see https://eslint.style/rules/default/new-parens for more)
+    "@stylistic/new-parens": "error",
+
+    // No extra semicolons in the code thx.
+    // (see https://eslint.style/rules/default/no-extra-semi for more)
+    "@stylistic/no-extra-semi": "error",
+
+    // No floting decimal dots. add 0 before or after.
+    // (see https://eslint.style/rules/default/no-floating-decimal for more)
+    "@stylistic/no-floating-decimal": "error",
+
+    // Warn user when mixing opperators to help with accidental priority issues.
+    // (see https://eslint.style/rules/default/no-mixed-operators for more)
+    "@stylistic/no-mixed-operators": [
+      "warn",
+      {
+        "groups": [
+          ["+", "-", "*", "/", "%", "**"],
+          ["&", "|", "^", "~", "<<", ">>", ">>>"],
+          ["==", "!=", "===", "!==", ">", ">=", "<", "<="],
+          ["&&", "||"],
+          ["in", "instanceof"]
+        ],
+        "allowSamePrecedence": false
+      }
+    ],
+
+    // No mixing of white space.
+    // (see https://eslint.style/rules/default/no-mixed-spaces-and-tabs for more)
+    "@stylistic/no-mixed-spaces-and-tabs": "error",
+
+    // No multiple spaces for usage except indentation and inline comments.
+    // (see https://eslint.style/rules/default/no-multi-spaces for more)
+    "@stylistic/no-multi-spaces": ["error", { "ignoreEOLComments": true }],
+
+    // No tabs allowed for spacing, we use 4x spaces instead.
+    // (see https://eslint.style/rules/default/no-tabs for more)
+    "@stylistic/no-tabs": "error",
+
+    // Keep property accses tight.
+    // (see https://eslint.style/rules/default/no-whitespace-before-property for more)
+    "@stylistic/no-whitespace-before-property": "error",
+
+    // single lane block should be placed indented below conditional / while.
+    // (see https://eslint.style/rules/default/nonblock-statement-body-position for more)
+    "@stylistic/nonblock-statement-body-position": ["error", "below"],
+
+    // Be consistant with curly brackets.
+    // (see https://eslint.style/rules/default/object-curly-newline for more)
+    "@stylistic/object-curly-newline": ["error", { "consistent": true }],
+
+    // Spacing in object curly braces.
+    // (see https://eslint.style/rules/default/object-curly-spacing for more)
+    "@stylistic/object-curly-spacing": ["error", "always"],
+
+    // One decleration per line.
+    // (see https://eslint.style/rules/default/one-var-declaration-per-line for more)
+    "@stylistic/one-var-declaration-per-line": ["error", "always"],
+
+    // If using linebreaks with opperation, the opperator should be before the secound opperand.
+    // (see https://eslint.style/rules/default/operator-linebreak for more)
+    "@stylistic/operator-linebreak": ["error", "before"],
+
+    // Dont pad your blocks with air, such spacing before and after the block instead
+    // (see https://eslint.style/rules/default/padded-blocks for more)
+    "@stylistic/padded-blocks": ["error", "never"],
+
+    // Use double Quotes when possible.
+    // (see https://eslint.style/rules/default/quotes for more)
+    "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
+
+    // When using ...a syntax keep dots connected to parameter.
+    // (see https://eslint.style/rules/default/rest-spread-spacing for more)
+    "@stylistic/rest-spread-spacing": ["error", "never"],
+
+    // Always use semicolons at appropriate location.
+    // (see https://eslint.style/rules/default/semi for more)
+    "@stylistic/semi": ["error", "always"],
+
+    // No spacing between semicolons and end of the code.
+    // (see https://eslint.style/rules/default/semi-spacing for more)
+    "@stylistic/semi-spacing": "error",
+
+    // Semicolons at the end of code.
+    // (see https://eslint.style/rules/default/semi-style for more)
+    "@stylistic/semi-style": ["error", "last"],
+
+    // SSpace before opening a code block.
+    // (see https://eslint.style/rules/default/space-before-blocks for more)
+    "@stylistic/space-before-blocks": "error",
+
+    // No space befor function parameters.
+    // (see https://eslint.style/rules/default/space-before-function-paren for more)
+    "@stylistic/space-before-function-paren": ["error", "never"],
+
+    // No space in parentheses.
+    // (see https://eslint.style/rules/default/space-in-parens for more)
+    "@stylistic/space-in-parens": ["error", "never"],
+
+    // space in infix operations.
+    // (see https://eslint.style/rules/default/space-infix-ops for more)
+    "@stylistic/space-infix-ops": "error",
+
+    // Comments need to have space after start.
+    // (see https://eslint.style/rules/default/spaced-comment for more)
+    "@stylistic/spaced-comment": ["error", "always"],
+
+    // Colon placement in switch statements.
+    // (see https://eslint.style/rules/default/switch-colon-spacing for more)
+    "@stylistic/switch-colon-spacing": [
+      "error",
+      { "after": true, "before": false }
+    ],
+
+    // Type annotation spacing
+    // (see https://eslint.style/rules/default/type-annotation-spacing for more)
+    "@stylistic/type-annotation-spacing": "error",
+
+    // Generic type annotation spacing
+    // (see https://eslint.style/rules/default/type-generic-spacing for more)
+    "@stylistic/type-generic-spacing": ["error"],
+
+    // Tuple type annotation spacing
+    // (see https://eslint.style/rules/default/type-named-tuple-spacing for more)
+    "@stylistic/type-named-tuple-spacing": ["error"]
+
+    /*
+
+        "@stylistic/no-const-assign": "error",
+        "@stylistic/no-dupe-args": "error",
+        "@stylistic/no-dupe-keys": "error",
+        "@stylistic/no-duplicate-case": "error",
+        "@stylistic/no-duplicate-imports": "warn",
+        "@stylistic/no-unreachable": "warn",
+        "@stylistic/curly": ["error", "multi-line"],
+        "@stylistic/default-case": "error",
+        "@stylistic/default-case-last": "error",
+        "@stylistic/default-param-last": ["error"],
+        "@stylistic/eqeqeq": ["error", "smart"],
+        "@stylistic/max-depth": ["warn", 4],
+        "@stylistic/no-else-return": ["error", { "allowElseIf": false}],
+        "@stylistic/no-empty": "warn",
+        "@stylistic/no-unneeded-ternary": "warn",
+        "@stylistic/yoda": ["error", "never", { "exceptRange": true}],
+        // "@stylistic/line-comment-position": ["warn", { "position": "above" }],
+
+        */
+  }
+}

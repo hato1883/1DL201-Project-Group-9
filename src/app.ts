@@ -1,6 +1,6 @@
-import * as PIXI from "pixi.js";
+import * as pixi from "pixi.js";
 
-const app = new PIXI.Application<HTMLCanvasElement>({width: 1425, height: 764});
+const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
 
 const maze_wall = 0;
@@ -99,35 +99,35 @@ const cell_width = app.screen.width / maze[0].length;
 
 function init_teture_array(
     maze: Array<Array<State>>
-): Array<Array<PIXI.Sprite>> {
-    const result = Array<Array<PIXI.Sprite>>(maze.length);
+): Array<Array<pixi.Sprite>> {
+    const result = Array<Array<pixi.Sprite>>(maze.length);
     maze.forEach((maze_row, row) => {
-        result[row] = Array<PIXI.Sprite>(maze_row.length);
+        result[row] = Array<pixi.Sprite>(maze_row.length);
         maze_row.forEach((cell, col) => {
-            result[row][col] = new PIXI.Sprite(PIXI.Texture.WHITE);
+            result[row][col] = new pixi.Sprite(pixi.Texture.WHITE);
             switch (cell) {
-                case maze_wall:
-                    result[row][col].tint = 0xa0a0a0;
-                    break;
+            case maze_wall:
+                result[row][col].tint = 0xa0a0a0;
+                break;
 
-                case not_visited:
-                    result[row][col].tint = 0xffffff;
-                    break;
+            case not_visited:
+                result[row][col].tint = 0xffffff;
+                break;
 
-                case visited:
-                    result[row][col].tint = 0xc4c4c4;
-                    break;
+            case visited:
+                result[row][col].tint = 0xc4c4c4;
+                break;
 
-                case queued:
-                    result[row][col].tint = 0x3bf7f1;
-                    break;
+            case queued:
+                result[row][col].tint = 0x3bf7f1;
+                break;
 
-                case next_in_queue:
-                    result[row][col].tint = 0xf7b63b;
-                    break;
+            case next_in_queue:
+                result[row][col].tint = 0xf7b63b;
+                break;
 
-                default:
-                    break;
+            default:
+                break;
             }
 
             result[row][col].width = cell_width;
@@ -141,10 +141,10 @@ function init_teture_array(
 }
 
 // create a new Sprite from an image path
-//const err = PIXI.Sprite.from("/assets/img/ermmm.png");
+// const err = pixi.Sprite.from("/assets/img/ermmm.png");
 
 // create sprite from url
-//const bunny = PIXI.Sprite.from("https://pixijs.com/assets/bunny.png");
+// const bunny = pixi.Sprite.from("https://pixijs.com/assets/bunny.png");
 
 const textures = init_teture_array(maze);
 console.log(textures);
@@ -161,9 +161,9 @@ app.ticker.add(() => {
         textures[row][col].tint = 0xf00f0;
         seconds = 0;
         console.log("Randoming");
-        let new_row = 0
-        let new_col = 0
-        while (maze[new_row][new_col] === maze_wall){
+        let new_row = 0;
+        let new_col = 0;
+        while (maze[new_row][new_col] === maze_wall) {
             new_col = col;
             new_row = row;
             if (Math.random() > 0.5) {
@@ -194,6 +194,7 @@ app.ticker.add(() => {
             textures[row][col].tint = 0xff0000;
         }
     }
+
     // just for fun, let's rotate mr rabbit a little
     // delta is 1 if running at 100% performance
     // creates frame-independent transformation

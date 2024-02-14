@@ -1,25 +1,30 @@
 {
-    "files.exclude": {
-      // hide all .js that are in a directory
-      "src/*.js": true,
-      "tests/*.js": true,
-      // hide all js.map that are in a directory
-      "src/*.js.map": true,
-      "tests/*.js.map": true,
+  "files.exclude": {
+    // hide all .js that are in a directory
+    "src/*.js": true,
+    "tests/*.js": true,
+    // hide all js.map that are in a directory
+    "src/*.js.map": true,
+    "tests/*.js.map": true,
 
-      // hide package-lock
-      "package-lock.json": true,
+    // hide package-lock
+    "package-lock.json": true,
 
-      // hide all Node Modules
-      "node_modules/": true,
+    // hide all Node Modules
+    "node_modules/": true,
 
-      // hide all dist directory used for building project
-      "dist/": true,
+    // hide all dist directory used for building project
+    "dist/": true,
 
-      // hide coverage directory created by jest
-      "coverage/": true
-    },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnPaste": true,
-    "editor.formatOnSave": false
+    // hide coverage directory created by jest
+    "coverage/": true
+  },
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": false,
+
+    "editor.codeActionsOnSave": {
+        // For ESLint
+        "source.fixAll.eslint": "always"
+    }
 }
