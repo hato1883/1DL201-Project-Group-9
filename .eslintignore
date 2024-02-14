@@ -2,4 +2,4 @@
 # as they will not follow our style.
 lib/**
 *.js
-
+**/dist
