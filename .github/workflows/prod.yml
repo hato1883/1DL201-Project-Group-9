@@ -1,0 +1,40 @@
+# Runs Jest and Eslint
+# Only on: ["push", "pull_request"] targeting the given branches
+# Target branch: "main"
+name: Production
+on:
+  push:
+    branches:
+      - 'main'
+
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    # clone latest commit
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install modules
+      run: npm i
+
+    - name: Run ESLint
+      run: npx eslint . --ext .ts,.tsx
+
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    # clone latest commit
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install modules
+      run: npm i
+
+    - name: Run Jest
+      run: npx jest --passWithNoTests

@@ -1,0 +1,22 @@
+# Runs Eslint ONLY
+# Only when: "Pushing"
+# Target branch: any
+name: Development
+on:
+  push:
+    paths:
+      - '**.ts'
+
+  pull_request:
+    paths:
+      - '**.ts'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install modules
+      run: npm i
+    - name: Run ESLint
+      run: npx eslint . --ext .ts,.tsx
