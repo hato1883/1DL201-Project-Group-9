@@ -3,6 +3,7 @@
     // hide all .js that are in a directory
     "src/*.js": true,
     "tests/*.js": true,
+    
     // hide all js.map that are in a directory
     "src/*.js.map": true,
     "tests/*.js.map": true,
@@ -19,7 +20,6 @@
     // hide coverage directory created by jest
     "coverage/": true
   },
-  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "editor.formatOnPaste": true,
   "editor.formatOnSave": false,
 
