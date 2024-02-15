@@ -1,6 +1,6 @@
 import {
     type Pair, pair, head, tail, type List, is_null, for_each, filter
-} from '../src/list';
+} from "../src/list";
 
 
 /**
@@ -10,7 +10,7 @@ import {
  * @invariant the head and tail are non-negative integers
  * @invariant the list does not contain any duplicate edges
  */
-export type EdgeList = List<Pair<number, number>>
+export type EdgeList = List<Pair<number, number>>;
 
 
 /**
@@ -19,20 +19,23 @@ export type EdgeList = List<Pair<number, number>>
  * @returns el with all reverse edges present, and all self loops removed
  */
 export function undirected(el: EdgeList): EdgeList {
-    if(is_null(el)) {
+    if (is_null(el)) {
         return el;
     } else if (head(head(el)) === tail(head(el))) {
         return undirected(tail(el));
     } else {
         const source = head(head(el));
-        const target = tail(head(el))
-        return pair(pair(target, source), 
-                    undirected(filter(edge => head(edge) !== target
-                                           || tail(edge) !== source, 
-                                      tail(el))));
+        const target = tail(head(el));
+        return pair(
+            pair(target, source),
+            undirected(filter(
+                (edge) => head(edge) !== target
+                || tail(edge) !== source,
+                tail(el)
+            ))
+        );
     }
 }
-
 
 
 // Build an array based on a function computing the item at each index
@@ -53,10 +56,9 @@ function build_array<T>(size: number, content: (i: number) => T): Array<T> {
  * @invariant Every inner array has length size.
  */
 export type MatrixGraph = {
-    adj: Array<Array<boolean>>,
-    size: number
+    adj: Array<Array<boolean>>;
+    size: number;
 };
-
 
 
 /**
@@ -65,8 +67,8 @@ export type MatrixGraph = {
  * @returns the new matrix graph, where each inner array entry is false.
  */
 export function mg_new(size: number): MatrixGraph {
-    return {size,
-            adj: build_array(size, _ => build_array(size, _ => false))};
+    return { size,
+             adj: build_array(size, () => build_array(size, () => false)) };
 }
 
 
@@ -79,7 +81,7 @@ export function mg_new(size: number): MatrixGraph {
  */
 export function mg_from_edges(size: number, edges: EdgeList): MatrixGraph {
     const result = mg_new(size);
-    for_each(p => result.adj[head(p)][tail(p)] = true, edges);
+    for_each((p) => result.adj[head(p)][tail(p)] = true, edges);
     return result;
 }
 
@@ -93,8 +95,8 @@ export function mg_from_edges(size: number, edges: EdgeList): MatrixGraph {
  * @invariant None of the target node ids appears twice in the same list.
  */
 export type ListGraph = {
-    adj: Array<List<number>>, // Lists may not be sorted
-    size: number
+    adj: Array<List<number>>; // Lists may not be sorted
+    size: number;
 };
 
 
@@ -104,7 +106,7 @@ export type ListGraph = {
  * @returns a new list graph with size edges.
  */
 export function lg_new(size: number): ListGraph {
-    return {size, adj: build_array(size, _ => null)};
+    return { size, adj: build_array(size, () => null) };
 }
 
 
@@ -117,11 +119,12 @@ export function lg_new(size: number): ListGraph {
  */
 export function lg_from_edges(size: number, edges: EdgeList): ListGraph {
     const result = lg_new(size);
-    for_each(p => result.adj[head(p)] = pair(tail(p), result.adj[head(p)]), 
-             edges);
+    for_each(
+        (p) => result.adj[head(p)] = pair(tail(p), result.adj[head(p)]),
+        edges
+    );
     return result;
 }
-
 
 
 /**
@@ -129,10 +132,10 @@ export function lg_from_edges(size: number, edges: EdgeList): ListGraph {
  * @param adj a list graph
  * @returns the transpose of adj
  */
-export function lg_transpose({size, adj}: ListGraph): ListGraph {
+export function lg_transpose({ size, adj }: ListGraph): ListGraph {
     const result = lg_new(size);
     for (var i = 0; i < size; i = i + 1) {
-        for_each(p => result.adj[p] = pair(i, result.adj[p]), adj[i]);
+        for_each((p) => result.adj[p] = pair(i, result.adj[p]), adj[i]);
     }
     return result;
 }

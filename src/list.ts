@@ -1,4 +1,3 @@
-
 // Provides a typed implementation of Source lists
 
 /**
@@ -63,8 +62,8 @@ export function is_null(v: any): v is null {
  * Create a list from an array.
  * @template S the element type of the new list
  * @param elements An array of values
- * @returns Returns a new list whose values are the same as in the elements array
- *     (in the same order).
+ * @returns Returns a new list whose values are the same 
+ * as in the elements array (in the same order).
  */
 export function list<S>(...elements: Array<S>): List<S> {
     let lst: List<S> = null;
@@ -96,8 +95,8 @@ export function to_string<T>(xs: List<T>): string {
     function print(s: Pair<T, List<T>>): string {
         const tl = tail(s);
         return is_null(tl)
-               ? head(s) + ""
-               : head(s) + ", " + print(tl);
+            ? head(s) + ""
+            : head(s) + ", " + print(tl);
     }
     if (xs === null) {
         return "list()";
@@ -123,7 +122,8 @@ export function length<T>(xs: List<T>): number {
 
 
 /**
- * Map a function over all entries in a list, creating a new list with the results
+ * Map a function over all entries in a list, 
+ * creating a new list with the results
  * Tail recursive.
  * @template T the element type of the argument list
  * @template U the return type of the function
@@ -131,11 +131,11 @@ export function length<T>(xs: List<T>): number {
  * @param xs the argument list
  * @returns the result of mapping f over xs
  */
-export function map<T, U>(f:(arg:T) => U, xs: List<T>): List<U> {
-    function $map<T, U>(f:(arg:T) => U, xs: List<T>, acc: List<U>): List<U> {
+export function map<T, U>(f: (arg: T) => U, xs: List<T>): List<U> {
+    function $map<T, U>(f: (arg: T) => U, xs: List<T>, acc: List<U>): List<U> {
         return is_null(xs)
-               ? reverse(acc)
-               : $map(f, tail(xs), pair(f(head(xs)), acc));
+            ? reverse(acc)
+            : $map(f, tail(xs), pair(f(head(xs)), acc));
     }
     return $map(f, xs, null);
 }
@@ -150,8 +150,12 @@ export function map<T, U>(f:(arg:T) => U, xs: List<T>): List<U> {
  * @returns the new list
  */
 export function build_list<T>(fun: (i: number) => T, n: number): List<T> {
-    function $build_list<T>(i: number, fun: (i: number) => T, already_built: List<T>): List<T> {
-        return i < 0 ? already_built : $build_list(i - 1, fun, pair(fun(i), already_built));
+    function $build_list<T>(i: number,
+                            fun: (i: number) => T,
+                            already_built: List<T>): List<T> {
+        return i < 0
+            ? already_built
+            : $build_list(i - 1, fun, pair(fun(i), already_built));
     }
     return $build_list(n - 1, fun, null);
 }
@@ -183,8 +187,8 @@ export function for_each<T, U>(fun: (arg: T) => U, xs: List<T>): void {
 export function reverse<T>(xs: List<T>): List<T> {
     function $reverse<T>(original: List<T>, reversed: List<T>): List<T> {
         return is_null(original)
-               ? reversed
-               : $reverse(tail(original), pair(head(original), reversed));
+            ? reversed
+            : $reverse(tail(original), pair(head(original), reversed));
     }
     return $reverse(xs, null);
 }
@@ -199,13 +203,16 @@ export function reverse<T>(xs: List<T>): List<T> {
  *     of list xs.
  */
 export function append<T>(xs: List<T>, ys: List<T>): List<T> {
-    function $append<T>(xs: List<T>, ys: List<T>,
-                        cont: (zs: List<T>) => List<T>): List<T> {
+    function $append<T>(
+        xs: List<T>,
+        ys: List<T>,
+        cont: (zs: List<T>) => List<T>
+    ): List<T> {
         return is_null(xs)
-               ? cont(ys)
-               : $append(tail(xs), ys, zs => cont(pair(head(xs), zs)));
+            ? cont(ys)
+            : $append(tail(xs), ys, (zs) => cont(pair(head(xs), zs)));
     }
-  return $append(xs, ys, xs => xs);
+    return $append(xs, ys, (xs) => xs);
 }
 
 
@@ -220,12 +227,11 @@ export function append<T>(xs: List<T>, ys: List<T>): List<T> {
  */
 export function member<T>(elem: T, xs: List<T>): List<T> {
     return is_null(xs)
-           ? null
-           : elem === head(xs)
-           ? xs
-           : member(elem, tail(xs));
+        ? null
+        : elem === head(xs)
+            ? xs
+            : member(elem, tail(xs));
 }
-
 
 
 /**
@@ -233,7 +239,8 @@ export function member<T>(elem: T, xs: List<T>): List<T> {
  * @template T the element type of the list
  * @param elem the element to remove
  * @param xs the list to remove elem from
- * @returns a version of xs where the first occurrence of elem (if any) has been removed
+ * @returns a version of xs where the first occurrence 
+ * of elem (if any) has been removed
  */
 export function remove<T>(elem: T, xs: List<T>): List<T> {
     function $remove<T>(v: T, xs: List<T>, acc: List<T>): List<T> {
@@ -241,10 +248,10 @@ export function remove<T>(elem: T, xs: List<T>): List<T> {
         const app = append;
         const rev = reverse;
         return is_null(xs)
-               ? app(rev(acc), xs)
-               : v === head(xs)
-               ? app(rev(acc), tail(xs))
-               : $remove(v, tail(xs), pair(head(xs), acc));
+            ? app(rev(acc), xs)
+            : v === head(xs)
+                ? app(rev(acc), tail(xs))
+                : $remove(v, tail(xs), pair(head(xs), acc));
     }
     return $remove(elem, xs, null);
 }
@@ -255,7 +262,8 @@ export function remove<T>(elem: T, xs: List<T>): List<T> {
  * @template T the element type of the list
  * @param elem the element to remove
  * @param xs the list to remove elem from
- * @returns a version of xs where all occurrences of elem (if any) have been removed
+ * @returns a version of xs where all occurrences 
+ * of elem (if any) have been removed
  */
 export function remove_all<T>(v: T, xs: List<T>): List<T> {
     function $remove_all<T>(v: T, xs: List<T>, acc: List<T>): List<T> {
@@ -263,10 +271,10 @@ export function remove_all<T>(v: T, xs: List<T>): List<T> {
         const app = append;
         const rev = reverse;
         return is_null(xs)
-               ? app(rev(acc), xs)
-               : v === head(xs)
-               ? $remove_all(v, tail(xs), acc)
-               : $remove_all(v, tail(xs), pair(head(xs), acc));
+            ? app(rev(acc), xs)
+            : v === head(xs)
+                ? $remove_all(v, tail(xs), acc)
+                : $remove_all(v, tail(xs), pair(head(xs), acc));
     }
     return $remove_all(v, xs, null);
 }
@@ -278,15 +286,18 @@ export function remove_all<T>(v: T, xs: List<T>): List<T> {
  * @template T the element type of the list
  * @param pred the predicate
  * @param xs the list
- * @returns the sublist of xs containing exactly those elements for which pred is true.
+ * @returns the sublist of xs containing exactly 
+ * those elements for which pred is true.
  */
 export function filter<T>(pred: (arg: T) => boolean, xs: List<T>): List<T> {
-    function $filter<T>(pred: (arg: T) => boolean, xs: List<T>, acc: List<T>): List<T> {
+    function $filter<T>(pred: (arg: T) => boolean,
+                        xs: List<T>,
+                        acc: List<T>): List<T> {
         return is_null(xs)
-               ? reverse(acc)
-               : pred(head(xs))
-               ? $filter(pred, tail(xs), pair(head(xs), acc))
-               : $filter(pred, tail(xs), acc);
+            ? reverse(acc)
+            : pred(head(xs))
+                ? $filter(pred, tail(xs), pair(head(xs), acc))
+                : $filter(pred, tail(xs), acc);
     }
     return $filter(pred, xs, null);
 }
@@ -309,15 +320,18 @@ export function all<T>(pred: (arg: T) => boolean, xs: List<T>): boolean {
  * Tail recursive.
  * @param start the first and smallest number in the list
  * @param end the last number in the list
- * @returns a list containing the numbers from start to end, inclusive, in order.
+ * @returns a list containing the numbers 
+ * from start to end, inclusive, in order.
  */
 export function enum_list(start: number, end: number): List<number> {
-    function $enum_list(start: number, end: number, acc: List<number>): List<number> {
+    function $enum_list(start: number,
+                        end: number,
+                        acc: List<number>): List<number> {
         // Ensure that typechecking of reverse are done independently
         const rev = reverse;
         return start > end
-               ? rev(acc)
-               : $enum_list(start + 1, end, pair(start, acc));
+            ? rev(acc)
+            : $enum_list(start + 1, end, pair(start, acc));
     }
     return $enum_list(start, end, null);
 }
@@ -333,12 +347,17 @@ export function enum_list(start: number, end: number): List<number> {
  *     or undefined if i is greater than or equal to the length of the list.
  */
 export function list_ref<T>(xs: List<T>, i: number): T | undefined {
-    return is_null(xs) ? undefined : i === 0 ? head(xs) : list_ref(tail(xs), i - 1);
+    return is_null(xs)
+        ? undefined
+        : i === 0
+            ? head(xs)
+            : list_ref(tail(xs), i - 1);
 }
 
 
 /**
- * Combines all elements of a list using a binary operation, in right-to-left order.
+ * Combines all elements of a list using 
+ * a binary operation, in right-to-left order.
  * Tail recursive.
  * accumulate(op, zero, list(1, 2, 3)) results in op(1, op(2, op(3, zero)))
  * @template T the element type of the list
@@ -349,22 +368,28 @@ export function list_ref<T>(xs: List<T>, i: number): T | undefined {
  * @returns the result of combining the elements of xs using op,
  *      from right to left starting with initial.
  */
-export function accumulate<T, U>(op: (arg: T, acc: U) => U,
-                                 initial: U, xs: List<T>): U {
-    function $accumulate<T, U>(op: (arg: T, acc: U) => U,
-                               initial: U, xs: List<T>,
-                               cont: (arg: U) => U): U {
+export function accumulate<T, U>(
+    op: (arg: T, acc: U) => U,
+    initial: U,
+    xs: List<T>
+): U {
+    function $accumulate<T, U>(
+        op: (arg: T, acc: U) => U,
+        initial: U,
+        xs: List<T>,
+        cont: (arg: U) => U
+    ): U {
         return is_null(xs)
-               ? cont(initial)
-               : $accumulate(op, initial, tail(xs), x => cont(op(head(xs), x)));
+            ? cont(initial)
+            : $accumulate(op, initial, tail(xs), (x) => cont(op(head(xs), x)));
     }
-    return $accumulate(op, initial, xs, x => x);
+    return $accumulate(op, initial, xs, (x) => x);
 }
 
 
-
 /**
- * Combines all elements of a list using a binary operation, in left-to-right order.
+ * Combines all elements of a list using 
+ * a binary operation, in left-to-right order.
  * Tail recursive.
  * fold_left(op, zero, list(1, 2, 3)) results in op(op(op(zero, 1), 2), 3)
  * @template T the element type of the list
@@ -375,10 +400,12 @@ export function accumulate<T, U>(op: (arg: T, acc: U) => U,
  * @returns the result of combining the elements of xs using op,
  *      from left to right starting with initial.
  */
-export function fold_left<T, U>(f: (acc: U, arg: T) => U, initial: U, xs: List<T>): U {
+export function fold_left<T, U>(f: (acc: U, arg: T) => U,
+                                initial: U,
+                                xs: List<T>): U {
     return is_null(xs)
-           ? initial
-           : fold_left(f, f(initial, head(xs)), tail(xs));
+        ? initial
+        : fold_left(f, f(initial, head(xs)), tail(xs));
 }
 
 
