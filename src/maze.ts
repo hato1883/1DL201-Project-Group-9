@@ -15,9 +15,3 @@ type maze = {
     matrix: Array<Array<maze_block>>;
 
 }
-
-// export function view_maze(inp:maze) {
-
-//     while()
-
-// }
