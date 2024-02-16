@@ -1,14 +1,14 @@
-type Free = true;
+export type Free = true;
 
-type Wall = false;
+export type Wall = false;
 
-type MazeBlock = Wall | Free;
+export type MazeBlock = Wall | Free;
 
 
 // TODO 
 // fixed size tuple of generic length try to incorperate maze size into the type
 
-type Maze = {
+export type Maze = {
     width: number;
     height: number;
     matrix: Array<Array<MazeBlock>>;
