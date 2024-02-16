@@ -4,13 +4,19 @@ import {
 
 
 /**
+ * A Node in a graph.
+ * @invariant the node is a non negative number
+ */
+export type Node = number;
+
+/**
  * A list of edges in a graph.
  * Each edge is a pair, where the head is the source of the edge, 
  * and the tail is the target.
  * @invariant the head and tail are non-negative integers
  * @invariant the list does not contain any duplicate edges
  */
-export type EdgeList = List<Pair<number, number>>;
+export type EdgeList = List<Pair<Node, Node>>;
 
 
 /**
@@ -95,7 +101,7 @@ export function mg_from_edges(size: number, edges: EdgeList): MatrixGraph {
  * @invariant None of the target node ids appears twice in the same list.
  */
 export type ListGraph = {
-    adj: Array<List<number>>; // Lists may not be sorted
+    adj: Array<List<Node>>; // Lists may not be sorted
     size: number;
 };
 
