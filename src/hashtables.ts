@@ -1,7 +1,6 @@
 import { type Pair, type List, head, tail, flatten,
     build_list, map, filter, pair, is_null } from "./list";
 
-
 /**
  * A hash function for use in hash tables
  * It should have good dispersion, but does not need to be
@@ -193,7 +192,7 @@ export function probe_linear<K>(hash: HashFunction<K>): ProbingFunction<K> {
 // quadratic probing with a given hash function
 export function probe_quadratic<K>(hash: HashFunction<K>): ProbingFunction<K> {
     function probe(length: number, key: K, i: number): number {
-        return ((hash(key) + i) * i) % length;
+        return (hash(key) + (((i * i) + i) / 2)) % length;
     }
     return probe;
 }
@@ -296,7 +295,18 @@ export function ph_insert<K, V>(
             return insert_from(i + 1);
         }
     }
-    return tab.keys.length === tab.size ? false : insert_from(0);
+    function replace_from(i: number): boolean {
+        const index = tab.probe(tab.keys.length, key, i);
+        if (tab.keys[index] === key) {
+            return insert_at(index);
+        } else {
+            if (i + 1 >= tab.size) {
+                return false;
+            }
+            return replace_from(i + 1);
+        }
+    }
+    return tab.keys.length === tab.size ? replace_from(0) : insert_from(0);
 }
 
 
