@@ -110,7 +110,7 @@
 
     // Rule for function parentheses placement.
     // (see https://eslint.style/rules/default/function-paren-newline for more)
-    "@stylistic/function-paren-newline": ["error", "consistent"],
+    "@stylistic/function-paren-newline": ["error", "multiline-arguments"],
 
     // Keep small lambda functions inline with parameter decleration.
     // (see https://eslint.style/rules/default/implicit-arrow-linebreak for more)
