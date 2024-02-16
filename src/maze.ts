@@ -1,17 +1,16 @@
+type Free = true;
+
+type Wall = false;
+
+type MazeBlock = Wall | Free;
 
 
-type free = true;
+// TODO 
+// fixed size tuple of generic length try to incorperate maze size into the type
 
-type wall = false;
+type Maze = {
+    width: number;
+    height: number;
+    matrix: Array<Array<MazeBlock>>;
 
-type maze_block = wall | free;
-
-
-// TODO fixed size tuple of generic length try to incorperate maze size into the type
-
-type maze = {
-    width: number,
-    height: number,
-    matrix: Array<Array<maze_block>>;
-
-}
+};
