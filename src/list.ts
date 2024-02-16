@@ -150,9 +150,11 @@ export function map<T, U>(f: (arg: T) => U, xs: List<T>): List<U> {
  * @returns the new list
  */
 export function build_list<T>(fun: (i: number) => T, n: number): List<T> {
-    function $build_list<T>(i: number,
-                            fun: (i: number) => T,
-                            already_built: List<T>): List<T> {
+    function $build_list<T>(
+        i: number,
+        fun: (i: number) => T,
+        already_built: List<T>
+    ): List<T> {
         return i < 0
             ? already_built
             : $build_list(i - 1, fun, pair(fun(i), already_built));
@@ -290,9 +292,11 @@ export function remove_all<T>(v: T, xs: List<T>): List<T> {
  * those elements for which pred is true.
  */
 export function filter<T>(pred: (arg: T) => boolean, xs: List<T>): List<T> {
-    function $filter<T>(pred: (arg: T) => boolean,
-                        xs: List<T>,
-                        acc: List<T>): List<T> {
+    function $filter<T>(
+        pred: (arg: T) => boolean,
+        xs: List<T>,
+        acc: List<T>
+    ): List<T> {
         return is_null(xs)
             ? reverse(acc)
             : pred(head(xs))
@@ -324,9 +328,11 @@ export function all<T>(pred: (arg: T) => boolean, xs: List<T>): boolean {
  * from start to end, inclusive, in order.
  */
 export function enum_list(start: number, end: number): List<number> {
-    function $enum_list(start: number,
-                        end: number,
-                        acc: List<number>): List<number> {
+    function $enum_list(
+        start: number,
+        end: number,
+        acc: List<number>
+    ): List<number> {
         // Ensure that typechecking of reverse are done independently
         const rev = reverse;
         return start > end
@@ -400,9 +406,11 @@ export function accumulate<T, U>(
  * @returns the result of combining the elements of xs using op,
  *      from left to right starting with initial.
  */
-export function fold_left<T, U>(f: (acc: U, arg: T) => U,
-                                initial: U,
-                                xs: List<T>): U {
+export function fold_left<T, U>(
+    f: (acc: U, arg: T) => U,
+    initial: U,
+    xs: List<T>
+): U {
     return is_null(xs)
         ? initial
         : fold_left(f, f(initial, head(xs)), tail(xs));
