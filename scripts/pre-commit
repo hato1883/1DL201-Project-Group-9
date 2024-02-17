@@ -19,7 +19,7 @@ npm run lint -- --fix
 
 status=$?
 
-if [ -n "${stash_commit}" ]
+if [[ -n "${stash_commit}" ]]
 then git stash apply "${stash_commit}"
 fi
 
