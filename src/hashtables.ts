@@ -208,6 +208,32 @@ export function probe_linear<K>(hash: HashFunction<K>): ProbingFunction<K> {
 }
 
 // quadratic probing with a given hash function
+/**
+ * Only use this probe if tablesize is a power of 2
+ * such as 1, 2, 4, 8, ..., 128, 256, etc
+ * uses a*i^2 + b where a = b = 1/2
+ * @example ```ts
+ *      // create a quadratic probing function that uses the simple hash of
+ *      // (input: number) => input
+ *      probe_quadratic(hash_id);
+ * 
+ *      // Can be used to create a hastable:
+ *      const probing_hashtable = ph_empty(128, probe_quadratic(hash_id));
+ * ```
+ * 
+ * check https://en.wikipedia.org/wiki/Quadratic_probing for why this is.
+ * 
+ * @template K The generic of the expected keys
+ * that will be used to store items in the table.
+ * 
+ * @param {HashFunction<K>} hash - a function that takes in a key
+ * of type K and returns a number
+ * 
+ * @returns {ProbingFunction<K>} a probing function that takes in
+ *  length: number of the hashtable number,
+ *  key: K of object to insert into the table,
+ *  i: number the current probing step.
+ */
 export function probe_quadratic<K>(hash: HashFunction<K>): ProbingFunction<K> {
     function probe(length: number, key: K, i: number): number {
         return (hash(key) + (((i * i) + i) / 2)) % length;
