@@ -279,9 +279,11 @@ export function ph_insert<K, V>(
     value: V
 ): boolean {
     function insert_at(index: number): true {
+        if (tab.keys[index] !== key) {
+            tab.size = tab.size + 1;
+        }
         tab.keys[index] = key;
         tab.data[index] = value;
-        tab.size = tab.size + 1;
         return true;
     }
     function insert_from(i: number): boolean {
