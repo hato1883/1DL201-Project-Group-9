@@ -184,6 +184,24 @@ export type ProbingHashtable<K, V> = {
     size: number; // number of elements
 };
 
+export function is_probing_table<K, T>(
+    table: ChainingHashtable<K, T> | ProbingHashtable<K, T>
+): table is ProbingHashtable<K, T> {
+    const has_keys = table.hasOwnProperty("keys");
+    const has_data = table.hasOwnProperty("data");
+    const has_probe = table.hasOwnProperty("probe");
+    const has_size = table.hasOwnProperty("size");
+    return has_keys && has_data && has_probe && has_size;
+}
+
+export function is_chaining_table<K, T>(
+    table: ChainingHashtable<K, T> | ProbingHashtable<K, T>
+): table is ChainingHashtable<K, T> {
+    const has_arr = table.hasOwnProperty("arr");
+    const has_hash = table.hasOwnProperty("hash");
+    return has_arr && has_hash;
+}
+
 // linear probing with a given hash function
 export function probe_linear<K>(hash: HashFunction<K>): ProbingFunction<K> {
     return (length: number, key: K, i: number) => (hash(key) + i) % length;
