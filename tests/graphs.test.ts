@@ -2,9 +2,10 @@ import {
     undirected, EdgeList,
     MatrixGraph, ListGraph,
     mg_from_edges, mg_new,
-    lg_from_edges, lg_new, lg_transpose
+    lg_from_edges, lg_new, lg_transpose, lg_bfs
 } from "../src/graphs";
 import { list } from "../src/list";
+import { Queue } from "../src/queue_immutable";
 
 
 /**
@@ -446,5 +447,158 @@ test("test transposing a list graph", () => {
                 ],
             size: 5
         } as ListGraph
+    );
+});
+
+test("test listgraph bfs", () => {
+    expect(
+        lg_bfs(
+            {
+                adj:
+                    [
+                        list(1),
+                        list(0)
+                    ],
+                size: 2
+            } as ListGraph,
+            0,
+            1
+        )
+    ).toStrictEqual(
+        [0, [1, null]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(
+            {
+                adj:
+                    [
+                        list(1),
+                        list(2),
+                        list(0)
+                    ],
+                size: 3
+            } as ListGraph,
+            0,
+            2
+        )
+    ).toStrictEqual(
+        [0, [1, [2, null]]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(
+            {
+                adj:
+                    [
+                        list(1),
+                        list(2),
+                        list(0)
+                    ],
+                size: 3
+            } as ListGraph,
+            1,
+            2
+        )
+    ).toStrictEqual(
+        [1, [2, null]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(
+            {
+                adj:
+                    [
+                        list(1),
+                        list(2),
+                        list()
+                    ],
+                size: 3
+            } as ListGraph,
+            2,
+            1
+        )
+    ).toStrictEqual(
+        null
+    );
+
+    expect(
+        lg_bfs(
+            {
+                adj:
+                    [
+                        list(1),
+                        list(2, 0),
+                        list(0, 1)
+                    ],
+                size: 3
+            } as ListGraph,
+            2,
+            1
+        )
+    ).toStrictEqual(
+        [2, [1, null]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(
+            {
+                adj:
+                    [
+                        list(1),
+                        list(2, 3),
+                        list(4),
+                        list(4),
+                        list()
+                    ],
+                size: 5
+            } as ListGraph,
+            0,
+            4
+        )
+    ).toStrictEqual(
+        [0, [1, [2, [4, null]]]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(
+            {
+                adj:
+                    [
+                        list(1),
+                        list(2, 3),
+                        list(4, 5),
+                        list(4),
+                        list(5),
+                        list()
+                    ],
+                size: 6
+            } as ListGraph,
+            0,
+            5
+        )
+    ).toStrictEqual(
+        [0, [1, [2, [5, null]]]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(
+            {
+                adj:
+                    [
+                        list(1),
+                        list(2, 3),
+                        list(4),
+                        list(4, 5),
+                        list(5),
+                        list()
+                    ],
+                size: 6
+            } as ListGraph,
+            0,
+            5
+        )
+    ).toStrictEqual(
+        [0, [1, [3, [5, null]]]] as Queue<number>
     );
 });
