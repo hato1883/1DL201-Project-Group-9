@@ -1,7 +1,7 @@
 import {
     Stack, NonEmptyStack,
     empty, is_empty, pop,
-    top, push, display_stack
+    top, push, display_stack, stack
 } from "../src/stack";
 
 
@@ -10,6 +10,26 @@ import {
  */
 test("test creating a empty stack", () => {
     expect(empty()).toStrictEqual(null);
+});
+
+test("test creating a non empty queue", () => {
+    expect(stack(1, 2)).toStrictEqual([1, [2, null]] as Stack<number>);
+
+    expect(top(stack(1, 2) as NonEmptyStack<number>))
+        .toStrictEqual(1);
+
+    expect(pop(stack(1, 2) as NonEmptyStack<number>))
+        .toStrictEqual([2, null] as Stack<number>);
+
+
+    expect(stack(1, 2, 3, 4))
+        .toStrictEqual([1, [2, [3, [4, null]]]] as Stack<number>);
+
+    expect(top(stack(1, 2, 3, 4) as NonEmptyStack<number>))
+        .toStrictEqual(1);
+
+    expect(pop(stack(1, 2, 3, 4) as NonEmptyStack<number>))
+        .toStrictEqual([2, [3, [4, null]]] as Stack<number>);
 });
 const empty_stack = empty();
 

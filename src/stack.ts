@@ -17,6 +17,29 @@ export function empty<T>(): Stack<T> {
 }
 
 /**
+ * Constructs a stack with all given elements in order,
+ * First elemennt in the arguments is the last element pushed to the Stack
+ * 
+ * @example
+ * ```ts
+ * stack(1, 2, 3);
+ * // results in the Stack(1, 2, 3)
+ * // where 1 is inserted last and 3 is inserted first.
+ * ```
+ * 
+ * @template T type of all queue elements
+ * @returns Returns an empty queue.
+ */
+export function stack<T>(...args: Array<T>): Stack<T> {
+    return args.reduceRight(
+        (built_stack: Stack<T>, item: T) => {
+            return push(item, built_stack);
+        },
+        empty<T>()
+    );
+}
+
+/**
  * Checks whether a stack is empty.
  * @template T type of all stack elements
  * @param stck stack to check for emptiness
