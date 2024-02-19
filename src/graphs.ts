@@ -1,6 +1,9 @@
 import {
     type Pair, pair, head, tail, type List, is_null, for_each, filter
 } from "../src/list";
+import { Path } from "./path";
+import { Queue, enqueue } from "./queue_immutable";
+import { Stack, empty, is_empty, pop, push, top } from "./stack";
 
 
 /**
@@ -144,4 +147,78 @@ export function lg_transpose({ size, adj }: ListGraph): ListGraph {
         for_each((p) => result.adj[p] = pair(i, result.adj[p]), adj[i]);
     }
     return result;
+}
+
+
+export function lg_dfs(
+    { size, adj }: ListGraph,
+    start: Node,
+    end: Node
+): Path {
+    // Exploration states
+    const initialized = 0;
+    const visited = 1;
+
+    // const explored = 2;
+
+    // create a data type to store:
+    // initialized / visited / explored state of each node.
+    const exploration_state = Array(size).fill(initialized);
+
+    // create a data type to store the path to the given node
+    // (Path from `start` node)
+    // All nodes start with a null path meaning there is no path
+    const path_to_node = Array<Path>(size).fill(null);
+
+    // Queue showing what node is next to check.
+    let next_node: Stack<Node> = empty();
+
+    // changes state of node to visisted,
+    // adds parent node if one was given else sets it to null.
+    // enqueues node to queue of nodes to check.
+    function lg_dfs_visit(node: Node, path_so_far: Queue<Node>): Queue<Node> {
+        exploration_state[node] = visited;
+        next_node = push(node, next_node);
+        return enqueue(node, path_so_far);
+    }
+
+    // enqueues the starting node with a empty path
+    path_to_node[start] = lg_dfs_visit(start, empty());
+
+    // Stepwise progression of bfs algorithm,
+    // can easily be made into a stream call.
+    function lg_dfs_step(): boolean {
+        if (!is_empty(next_node)) {
+            const node = top(next_node);
+            next_node = pop(next_node);
+            if (node === end) {
+                // TODO: return result
+                return false;
+            }
+            for_each(
+                (unvisted_node) => {
+                    path_to_node[unvisted_node] = lg_dfs_visit(
+                        unvisted_node,
+                        path_to_node[node]
+                    );
+                },
+                filter((edge_endpoint) => {
+                    return exploration_state[edge_endpoint] === initialized;
+                }, adj[node])
+            );
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // runs lg_dfs_step untill we have either visited all nodes
+    // or we are at the goal.
+    let running = lg_dfs_step();
+    while (running) {
+        // run lg_dfs_step untill we are at the end.
+        running = lg_dfs_step();
+    }
+
+    return path_to_node[end];
 }
