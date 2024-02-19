@@ -153,12 +153,38 @@ export function lg_transpose({ size, adj }: ListGraph): ListGraph {
 }
 
 /**
- * Transpose a list graph
- * @param adj a list graph
- * @returns the transpose of adj
+ * Runs the breadth first serach algorithm to find a path between start and end,
+ * This dose not account for weigthed graphs.
+ * 
+ * @example
+ * ```ts
+ * const listgraph: ListGraph = {
+ *     adj: [
+ *         list(1, 3),    // 0: -> 1, -> 3
+ *         list(2, 5),    // 1: -> 2, -> 5
+ *         list(6),       // 2: -> 6
+ *         list(2, 4, 6), // 3: -> 2, -> 4, -> 6
+ *         list(6),       // 4: -> 6
+ *         list(4, 7),    // 5: -> 4, -> 5
+ *         list(),        // 6:
+ *         list(6)        // 7: -> 6
+ *     ],
+ *     size: 8
+ * };
+ * lg_breadth_first(listgraph, 0, 6);
+ * // results in Queue(0, 3, 6)
+ * // meaing 0 -> 3 -> 6
+ * ```
+ * 
+ * @param graph the unweighted listgraph to perform the breadth first search on.
+ * @param start the starting node to search from
+ * @param end the ending node you want to reach
+ * @returns A Path type conatining either
+ * a Queue<Node> of nodes to visit in order to reach the end 
+ * or null if no path was found from start to end.
  */
 export function lg_breadth_first(
-    { size, adj }: ListGraph,
+    graph: ListGraph,
     start: Node,
     end: Node
 ): Path {
@@ -170,12 +196,12 @@ export function lg_breadth_first(
 
     // create a data type to store:
     // initialized / visited / explored state of each node.
-    const exploration_state = Array(size).fill(initialized);
+    const exploration_state = Array(graph.size).fill(initialized);
 
     // create a data type to store the path to the given node
     // (Path from `start` node)
     // All nodes start with a null path meaning there is no path
-    const path_to_node = Array<Path>(size).fill(null);
+    const path_to_node = Array<Path>(graph.size).fill(null);
 
     // Queue showing what node is next to check.
     let next_node: Queue<Node> = empty();
@@ -214,7 +240,7 @@ export function lg_breadth_first(
                 },
                 filter((edge_endpoint) => {
                     return exploration_state[edge_endpoint] === initialized;
-                }, adj[node])
+                }, graph.adj[node])
             );
             return true;
         } else {
