@@ -5,7 +5,11 @@ import {
     free, new_maze,
     maze_to_listgraph,
     flatten_index,
-    deepen_index
+    deepen_index,
+    MazeBlock,
+    is_path,
+    is_wall,
+    Free, Wall
 } from "../src/maze";
 
 
@@ -49,6 +53,22 @@ test("Test creating a maze", () => {
             ]
         } as Maze
     );
+});
+
+test("Test checking MazeBlock type", () => {
+    expect(is_path(true as MazeBlock)).toBeTruthy();
+    expect(is_path(false as MazeBlock)).toBeFalsy();
+    expect(is_path(true as MazeBlock)).toMatchObject<Free>;
+    expect(is_path(false as MazeBlock)).toMatchObject<Exclude<MazeBlock, Free>>;
+
+    expect(is_wall(false as MazeBlock)).toBeTruthy();
+    expect(is_wall(true as MazeBlock)).toBeFalsy();
+
+    // check if true which is Free type is a wall
+    // It is not but this method can ONLY check if it is a wall so result should
+    // be a Mazeblock that issnt a Wall
+    expect(is_path(true as MazeBlock)).toMatchObject<Exclude<MazeBlock, Wall>>;
+    expect(is_wall(false as MazeBlock)).toMatchObject<Wall>;
 });
 
 const maze_1x1_free = new_maze(1);

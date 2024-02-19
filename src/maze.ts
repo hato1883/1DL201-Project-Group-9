@@ -20,6 +20,14 @@ export type Maze = {
 
 };
 
+export function is_path(maze_block: MazeBlock): maze_block is Free {
+    return maze_block;
+}
+
+export function is_wall(maze_block: MazeBlock): maze_block is Wall {
+    return !maze_block;
+}
+
 export function new_maze(size: number, default_block: MazeBlock = free): Maze {
     const matrix = Array<Array<MazeBlock>>(size);
     matrix.fill(Array<MazeBlock>(size));
@@ -122,7 +130,7 @@ export function maze_to_listgraph(maze: Maze): ListGraph {
     function has_edge(row: number, col: number): boolean {
         return 0 <= row && row < maze.matrix.length
             ? 0 <= col && col < maze.matrix[row].length
-                ? maze.matrix[row][col] !== wall
+                ? is_path(maze.matrix[row][col])
                     ? true
                     : false
                 : false
@@ -131,7 +139,7 @@ export function maze_to_listgraph(maze: Maze): ListGraph {
     let edges: EdgeList = list();
     maze.matrix.forEach((maze_row, row_index) => {
         maze_row.forEach((maze_block, col_index) => {
-            if (maze_block !== wall) {
+            if (is_path(maze_block)) {
                 const source = flatten_index(row_index, col_index, maze);
                 for (let x_offset = -1; x_offset < 1; x_offset += 2) {
                     if (has_edge(row_index, col_index + x_offset)) {
