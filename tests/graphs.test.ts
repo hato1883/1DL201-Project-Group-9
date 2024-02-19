@@ -2,7 +2,7 @@ import {
     undirected, EdgeList,
     MatrixGraph, ListGraph,
     mg_from_edges, mg_new,
-    lg_from_edges, lg_new, lg_transpose, lg_dfs
+    lg_from_edges, lg_new, lg_transpose, lg_depth_first
 } from "../src/graphs";
 import { list } from "../src/list";
 import { Queue } from "../src/queue_immutable";
@@ -475,7 +475,7 @@ const listgraph: ListGraph = {
 
 test("test listgraph bfs", () => {
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -492,7 +492,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -510,7 +510,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -528,7 +528,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -546,7 +546,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -564,7 +564,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -584,7 +584,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -605,7 +605,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -626,7 +626,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -647,7 +647,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(
+        lg_depth_first(
             {
                 adj:
                     [
@@ -668,25 +668,25 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_dfs(listgraph, a, g)
+        lg_depth_first(listgraph, a, g)
     ).toStrictEqual(
         [a, [d, [g, null]]] as Queue<number>
     );
 
     expect(
-        lg_dfs(listgraph, a, h)
+        lg_depth_first(listgraph, a, h)
     ).toStrictEqual(
         [a, [b, [f, [h, null]]]] as Queue<number>
     );
 
     expect(
-        lg_dfs(listgraph, a, c)
+        lg_depth_first(listgraph, a, c)
     ).toStrictEqual(
         [a, [d, [c, null]]] as Queue<number>
     );
 
     expect(
-        lg_dfs(listgraph, a, e)
+        lg_depth_first(listgraph, a, e)
     ).toStrictEqual(
         [a, [d, [e, null]]] as Queue<number>
     );
