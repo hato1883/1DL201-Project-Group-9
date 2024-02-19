@@ -157,7 +157,7 @@ export function lg_transpose({ size, adj }: ListGraph): ListGraph {
  * @param adj a list graph
  * @returns the transpose of adj
  */
-export function lg_bfs(
+export function lg_breadth_first(
     { size, adj }: ListGraph,
     start: Node,
     end: Node
@@ -183,18 +183,21 @@ export function lg_bfs(
     // changes state of node to visisted,
     // adds parent node if one was given else sets it to null.
     // enqueues node to queue of nodes to check.
-    function lg_bfs_visit(node: Node, path_so_far: Queue<Node>): Queue<Node> {
+    function lg_breadth_first_visit(
+        node: Node,
+        path_so_far: Queue<Node>
+    ): Queue<Node> {
         exploration_state[node] = visited;
         next_node = enqueue(node, next_node);
         return enqueue(node, path_so_far);
     }
 
     // enqueues the starting node with a empty path
-    path_to_node[start] = lg_bfs_visit(start, empty());
+    path_to_node[start] = lg_breadth_first_visit(start, empty());
 
     // Stepwise progression of bfs algorithm,
     // can easily be made into a stream call.
-    function lg_bfs_step(): boolean {
+    function lg_breadth_first_step(): boolean {
         if (!is_empty(next_node)) {
             const node = queue_head(next_node);
             next_node = dequeue(next_node);
@@ -204,7 +207,7 @@ export function lg_bfs(
             }
             for_each(
                 (unvisted_node) => {
-                    path_to_node[unvisted_node] = lg_bfs_visit(
+                    path_to_node[unvisted_node] = lg_breadth_first_visit(
                         unvisted_node,
                         path_to_node[node]
                     );
@@ -219,12 +222,12 @@ export function lg_bfs(
         }
     }
 
-    // runs lg_bfs_step untill we have either visited all nodes
+    // runs lg_breadth_first_step untill we have either visited all nodes
     // or we are at the goal.
-    let running = lg_bfs_step();
+    let running = lg_breadth_first_step();
     while (running) {
-        // run lg_bfs_step untill we are at the end.
-        running = lg_bfs_step();
+        // run lg_breadth_first_step untill we are at the end.
+        running = lg_breadth_first_step();
     }
 
     return path_to_node[end];

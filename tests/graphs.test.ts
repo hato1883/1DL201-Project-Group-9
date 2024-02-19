@@ -2,7 +2,7 @@ import {
     undirected, EdgeList,
     MatrixGraph, ListGraph,
     mg_from_edges, mg_new,
-    lg_from_edges, lg_new, lg_transpose, lg_bfs
+    lg_from_edges, lg_new, lg_transpose, lg_breadth_first
 } from "../src/graphs";
 import { list } from "../src/list";
 import { Queue } from "../src/queue_immutable";
@@ -474,7 +474,7 @@ const listgraph: ListGraph = {
 
 test("test listgraph bfs", () => {
     expect(
-        lg_bfs(
+        lg_breadth_first(
             {
                 adj:
                     [
@@ -491,7 +491,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_bfs(
+        lg_breadth_first(
             {
                 adj:
                     [
@@ -509,7 +509,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_bfs(
+        lg_breadth_first(
             {
                 adj:
                     [
@@ -527,7 +527,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_bfs(
+        lg_breadth_first(
             {
                 adj:
                     [
@@ -545,7 +545,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_bfs(
+        lg_breadth_first(
             {
                 adj:
                     [
@@ -563,7 +563,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_bfs(
+        lg_breadth_first(
             {
                 adj:
                     [
@@ -583,7 +583,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_bfs(
+        lg_breadth_first(
             {
                 adj:
                     [
@@ -604,7 +604,7 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_bfs(
+        lg_breadth_first(
             {
                 adj:
                     [
@@ -625,25 +625,25 @@ test("test listgraph bfs", () => {
     );
 
     expect(
-        lg_bfs(listgraph, a, g)
+        lg_breadth_first(listgraph, a, g)
     ).toStrictEqual(
         [a, [d, [g, null]]] as Queue<number>
     );
 
     expect(
-        lg_bfs(listgraph, a, h)
+        lg_breadth_first(listgraph, a, h)
     ).toStrictEqual(
         [a, [b, [f, [h, null]]]] as Queue<number>
     );
 
     expect(
-        lg_bfs(listgraph, a, c)
+        lg_breadth_first(listgraph, a, c)
     ).toStrictEqual(
         [a, [b, [c, null]]] as Queue<number>
     );
 
     expect(
-        lg_bfs(listgraph, a, e)
+        lg_breadth_first(listgraph, a, e)
     ).toStrictEqual(
         [a, [d, [e, null]]] as Queue<number>
     );
