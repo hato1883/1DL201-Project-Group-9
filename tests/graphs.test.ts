@@ -450,22 +450,44 @@ test("test transposing a list graph", () => {
     );
 });
 
+const a = 0;
+const b = 1;
+const c = 2;
+const d = 3;
+const e = 4;
+const f = 5;
+const g = 6;
+const h = 7;
+const listgraph: ListGraph = {
+    adj: [
+        list(b, d), // A: 0
+        list(c, f), // B: 1
+        list(g), // C: 2
+        list(c, e, g), // D: 3
+        list(g), // E: 4
+        list(e, h), // F: 5
+        list(), // G: 6
+        list(g) // H: 7
+    ],
+    size: 8
+};
+
 test("test listgraph bfs", () => {
     expect(
         lg_bfs(
             {
                 adj:
                     [
-                        list(1),
-                        list(0)
+                        list(b),
+                        list(a)
                     ],
                 size: 2
             } as ListGraph,
-            0,
-            1
+            a,
+            b
         )
     ).toStrictEqual(
-        [0, [1, null]] as Queue<number>
+        [a, [b, null]] as Queue<number>
     );
 
     expect(
@@ -473,17 +495,17 @@ test("test listgraph bfs", () => {
             {
                 adj:
                     [
-                        list(1),
-                        list(2),
-                        list(0)
+                        list(b),
+                        list(c),
+                        list(a)
                     ],
                 size: 3
             } as ListGraph,
-            0,
-            2
+            a,
+            c
         )
     ).toStrictEqual(
-        [0, [1, [2, null]]] as Queue<number>
+        [a, [b, [c, null]]] as Queue<number>
     );
 
     expect(
@@ -491,17 +513,17 @@ test("test listgraph bfs", () => {
             {
                 adj:
                     [
-                        list(1),
-                        list(2),
-                        list(0)
+                        list(b),
+                        list(c),
+                        list(a)
                     ],
                 size: 3
             } as ListGraph,
-            1,
-            2
+            b,
+            c
         )
     ).toStrictEqual(
-        [1, [2, null]] as Queue<number>
+        [b, [c, null]] as Queue<number>
     );
 
     expect(
@@ -509,14 +531,14 @@ test("test listgraph bfs", () => {
             {
                 adj:
                     [
-                        list(1),
-                        list(2),
+                        list(b),
+                        list(c),
                         list()
                     ],
                 size: 3
             } as ListGraph,
-            2,
-            1
+            c,
+            b
         )
     ).toStrictEqual(
         null
@@ -527,17 +549,17 @@ test("test listgraph bfs", () => {
             {
                 adj:
                     [
-                        list(1),
-                        list(2, 0),
-                        list(0, 1)
+                        list(b),
+                        list(c, a),
+                        list(a, b)
                     ],
                 size: 3
             } as ListGraph,
-            2,
-            1
+            c,
+            b
         )
     ).toStrictEqual(
-        [2, [1, null]] as Queue<number>
+        [c, [b, null]] as Queue<number>
     );
 
     expect(
@@ -545,19 +567,19 @@ test("test listgraph bfs", () => {
             {
                 adj:
                     [
-                        list(1),
-                        list(2, 3),
-                        list(4),
-                        list(4),
+                        list(b),
+                        list(c, d),
+                        list(e),
+                        list(e),
                         list()
                     ],
                 size: 5
             } as ListGraph,
-            0,
-            4
+            a,
+            e
         )
     ).toStrictEqual(
-        [0, [1, [2, [4, null]]]] as Queue<number>
+        [a, [b, [c, [e, null]]]] as Queue<number>
     );
 
     expect(
@@ -565,20 +587,20 @@ test("test listgraph bfs", () => {
             {
                 adj:
                     [
-                        list(1),
-                        list(2, 3),
-                        list(4, 5),
-                        list(4),
-                        list(5),
+                        list(b),
+                        list(c, d),
+                        list(e, f),
+                        list(e),
+                        list(f),
                         list()
                     ],
                 size: 6
             } as ListGraph,
-            0,
-            5
+            a,
+            f
         )
     ).toStrictEqual(
-        [0, [1, [2, [5, null]]]] as Queue<number>
+        [a, [b, [c, [f, null]]]] as Queue<number>
     );
 
     expect(
@@ -586,19 +608,43 @@ test("test listgraph bfs", () => {
             {
                 adj:
                     [
-                        list(1),
-                        list(2, 3),
-                        list(4),
-                        list(4, 5),
-                        list(5),
+                        list(b),
+                        list(c, d),
+                        list(e),
+                        list(e, f),
+                        list(f),
                         list()
                     ],
                 size: 6
             } as ListGraph,
-            0,
-            5
+            a,
+            f
         )
     ).toStrictEqual(
-        [0, [1, [3, [5, null]]]] as Queue<number>
+        [a, [b, [d, [f, null]]]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(listgraph, a, g)
+    ).toStrictEqual(
+        [a, [d, [g, null]]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(listgraph, a, h)
+    ).toStrictEqual(
+        [a, [b, [f, [h, null]]]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(listgraph, a, c)
+    ).toStrictEqual(
+        [a, [b, [c, null]]] as Queue<number>
+    );
+
+    expect(
+        lg_bfs(listgraph, a, e)
+    ).toStrictEqual(
+        [a, [d, [e, null]]] as Queue<number>
     );
 });
