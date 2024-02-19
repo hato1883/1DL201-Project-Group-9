@@ -150,7 +150,7 @@ export function lg_transpose({ size, adj }: ListGraph): ListGraph {
 }
 
 
-export function lg_dfs(
+export function lg_depth_first(
     { size, adj }: ListGraph,
     start: Node,
     end: Node
@@ -176,18 +176,22 @@ export function lg_dfs(
     // changes state of node to visisted,
     // adds parent node if one was given else sets it to null.
     // enqueues node to queue of nodes to check.
-    function lg_dfs_visit(node: Node, path_so_far: Queue<Node>): Queue<Node> {
+    function lg_depth_first_visit(
+        node: Node,
+        path_so_far:
+        Queue<Node>
+    ): Queue<Node> {
         exploration_state[node] = visited;
         next_node = push(node, next_node);
         return enqueue(node, path_so_far);
     }
 
     // enqueues the starting node with a empty path
-    path_to_node[start] = lg_dfs_visit(start, empty());
+    path_to_node[start] = lg_depth_first_visit(start, empty());
 
     // Stepwise progression of bfs algorithm,
     // can easily be made into a stream call.
-    function lg_dfs_step(): boolean {
+    function lg_depth_first_step(): boolean {
         if (!is_empty(next_node)) {
             const node = top(next_node);
             next_node = pop(next_node);
@@ -197,7 +201,7 @@ export function lg_dfs(
             }
             for_each(
                 (unvisted_node) => {
-                    path_to_node[unvisted_node] = lg_dfs_visit(
+                    path_to_node[unvisted_node] = lg_depth_first_visit(
                         unvisted_node,
                         path_to_node[node]
                     );
@@ -212,12 +216,12 @@ export function lg_dfs(
         }
     }
 
-    // runs lg_dfs_step untill we have either visited all nodes
+    // runs lg_depth_first_step untill we have either visited all nodes
     // or we are at the goal.
-    let running = lg_dfs_step();
+    let running = lg_depth_first_step();
     while (running) {
-        // run lg_dfs_step untill we are at the end.
-        running = lg_dfs_step();
+        // run lg_depth_first_step untill we are at the end.
+        running = lg_depth_first_step();
     }
 
     return path_to_node[end];
