@@ -1,19 +1,39 @@
 import {
     Queue, NonEmptyQueue,
     empty, is_empty, dequeue,
-    head, enqueue, display_queue
+    head, enqueue, display_queue, queue
 } from "../src/queue_immutable";
 
 
 /**
- * Test implementation of Stack
+ * Test implementation of queue
  */
-test("test creating a empty stack", () => {
+test("test creating a empty queue", () => {
     expect(empty()).toStrictEqual(null);
+});
+
+test("test creating a non empty queue", () => {
+    expect(queue(1, 2)).toStrictEqual([1, [2, null]] as Queue<number>);
+
+    expect(head(queue(1, 2) as NonEmptyQueue<number>))
+        .toStrictEqual(1);
+
+    expect(dequeue(queue(1, 2) as NonEmptyQueue<number>))
+        .toStrictEqual([2, null] as Queue<number>);
+
+
+    expect(queue(1, 2, 3, 4))
+        .toStrictEqual([1, [2, [3, [4, null]]]] as Queue<number>);
+
+    expect(head(queue(1, 2, 3, 4) as NonEmptyQueue<number>))
+        .toStrictEqual(1);
+    expect(dequeue(queue(1, 2, 3, 4) as NonEmptyQueue<number>))
+
+        .toStrictEqual([2, [3, [4, null]]] as Queue<number>);
 });
 const empty_queue = empty();
 
-test("test if stack is empty", () => {
+test("test if queue is empty", () => {
     expect(is_empty(empty())).toBeTruthy();
     expect(is_empty((null as Queue<unknown>))).toBeTruthy();
     expect(is_empty(null)).toBeTruthy();
@@ -25,7 +45,7 @@ test("test if stack is empty", () => {
     ).toBeFalsy();
 });
 
-test("test pushing item to stack", () => {
+test("test pushing item to queue", () => {
     expect(enqueue("1", empty_queue)).toStrictEqual(["1", null]);
 
     expect(
@@ -41,7 +61,7 @@ test("test pushing item to stack", () => {
     ).toStrictEqual(["1", ["2", ["3", ["4", null]]]]);
 });
 
-test("test calling top of a stack", () => {
+test("test calling top of a queue", () => {
     expect(
         head((["1", null] as NonEmptyQueue<unknown>))
     ).toStrictEqual("1");
@@ -67,7 +87,7 @@ test("test calling top of a stack", () => {
     ).toStrictEqual("2");
 });
 
-test("test calling pop of a stack", () => {
+test("test calling pop of a queue", () => {
     expect(
         dequeue((["1", null] as NonEmptyQueue<unknown>))
     ).toStrictEqual(null);
@@ -103,7 +123,7 @@ test("test calling pop of a stack", () => {
     ).toStrictEqual(["2", ["3", null]]);
 });
 
-test("test calling display_stack on a stack", () => {
+test("test calling display_queue on a queue", () => {
     // replace console.log function
     const console_log_mock = jest.spyOn(console, "log").mockImplementation();
 
