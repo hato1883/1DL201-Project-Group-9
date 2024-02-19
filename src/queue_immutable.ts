@@ -37,9 +37,6 @@ export function queue<T>(...args: Array<T>): Queue<T> {
         },
         empty<T>()
     );
-    let result = empty<T>();
-    args.forEach((element: T) => result = enqueue(element, result));
-    return result;
 }
 
 /**
