@@ -17,6 +17,32 @@ export function empty<T>(): Queue<T> {
 }
 
 /**
+ * Constructs a queue with all given elements in order,
+ * First elemennt in the arguments is the first element in the Queue
+ * 
+ * @example
+ * ```ts
+ * queue(1, 2, 3);
+ * // results in the Queue(1, 2, 3)
+ * // where 1 is first and 3 is last.
+ * ```
+ * 
+ * @template T type of all queue elements
+ * @returns Returns an empty queue.
+ */
+export function queue<T>(...args: Array<T>): Queue<T> {
+    return args.reduce(
+        (built_stack: Queue<T>, item: T) => {
+            return enqueue(item, built_stack);
+        },
+        empty<T>()
+    );
+    let result = empty<T>();
+    args.forEach((element: T) => result = enqueue(element, result));
+    return result;
+}
+
+/**
  * Checks whether a queue is empty.
  * @template T type of all queue elements
  * @param q queue to check for emptiness
