@@ -1,6 +1,12 @@
 import {
     type Pair, pair, head, tail, type List, is_null, for_each, filter
 } from "../src/list";
+import { Path } from "./path";
+import {
+    Queue, dequeue, enqueue,
+    empty, is_empty,
+    head as queue_head
+} from "./queue_immutable";
 
 
 /**
@@ -144,4 +150,99 @@ export function lg_transpose({ size, adj }: ListGraph): ListGraph {
         for_each((p) => result.adj[p] = pair(i, result.adj[p]), adj[i]);
     }
     return result;
+}
+
+/**
+ * Transpose a list graph
+ * @param adj a list graph
+ * @returns the transpose of adj
+ */
+export function lg_bfs(
+    { size, adj }: ListGraph,
+    start: Node,
+    end: Node
+): Path {
+    // Exploration states
+    const initialized = 0;
+    const visited = 1;
+
+    // const explored = 2;
+
+    // create a data type to store:
+    // initialized / visited / explored state of each node.
+    const exploration_state = Array(size).fill(initialized);
+
+    // create a data type to store closest node
+    // is null if it is our starting node,
+    // and undefined if node has no parent otherwise points to parent node
+    const closest_parent_node = Array<Node | null>(size);
+
+    // Queue showing what node is next to check.
+    let next_node: Queue<Node> = empty();
+
+    // changes state of node to visisted,
+    // adds parent node if one was given else sets it to null.
+    // enqueues node to queue of nodes to check.
+    function lg_bfs_visit(node: Node, parent: Node | null = null): void {
+        exploration_state[node] = visited;
+        closest_parent_node[node] = closest_parent_node[node] === undefined
+            ? parent
+            : closest_parent_node[node];
+        next_node = enqueue(node, next_node);
+    }
+
+    // enqueues the starting node
+    lg_bfs_visit(start);
+
+    // Stepwise progression of bfs algorithm,
+    // can easily be made into a stream call.
+    function lg_bfs_step(): boolean {
+        if (!is_empty(next_node)) {
+            const node = queue_head(next_node);
+            next_node = dequeue(next_node);
+            if (node === end) {
+                // TODO: return result
+                return false;
+            }
+            for_each(
+                (unvisted_node) => lg_bfs_visit(unvisted_node, node),
+                filter((edge_endpoint) => {
+                    return exploration_state[edge_endpoint] === initialized;
+                }, adj[node])
+            );
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // runs lg_bfs_step untill we have either visited all nodes
+    // or we are at the goal.
+    let running = lg_bfs_step();
+    while (running) {
+        // run lg_bfs_step untill we are at the end.
+        running = lg_bfs_step();
+    }
+
+    // use the closest_parent_node to build a path from end node to start node.
+    function build_path(node: Node): Path {
+        if (closest_parent_node[node] === null) {
+            // If parent node has null as parent node
+            // that means it was the starting node
+            // Meaning there is a path from Start to End
+            return enqueue(node, empty());
+        } else if (closest_parent_node[node] === undefined) {
+            // If parent node has undefined as parent node
+            // that means it did not orignate from start node
+            // Meaning there is no path from Start to End
+            return null;
+        } else {
+            const path = build_path(closest_parent_node[node] as Node);
+
+            // If no path was made from parent node That means there are no path
+            // else add this node last to the path
+            return is_empty(path) ? path : enqueue(node, path);
+        }
+    }
+    return build_path(end);
 }
