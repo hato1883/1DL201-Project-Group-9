@@ -2,11 +2,16 @@ import {
     type Pair, pair, head, tail, type List, is_null, for_each, filter
 } from "../src/list";
 import { Path } from "./path";
-import { Queue, enqueue } from "./queue_immutable";
-import { Stack, empty as empty_stack, is_empty as is_stack_empty, pop, push, top } from "./stack";
+import {
+    Stack, pop, push,
+    empty as empty_stack,
+    is_empty as is_stack_empty,
+    top as stack_head
+} from "./stack";
 import {
     Queue, dequeue, enqueue,
-    empty as empty_queue, is_empty as is_queue_empty,
+    empty as empty_queue,
+    is_empty as is_queue_empty,
     head as queue_head
 } from "./queue_immutable";
 
@@ -212,7 +217,7 @@ export function lg_depth_first(
     const path_to_node = Array<Path>(graph.size).fill(null);
 
     // Queue showing what node is next to check.
-    let next_node: Stack<Node> = empty();
+    let next_node: Stack<Node> = empty_stack();
 
     // changes state of node to visisted,
     // adds parent node if one was given else sets it to null.
@@ -228,13 +233,13 @@ export function lg_depth_first(
     }
 
     // enqueues the starting node with a empty path
-    path_to_node[start] = lg_depth_first_visit(start, empty());
+    path_to_node[start] = lg_depth_first_visit(start, empty_stack());
 
     // Stepwise progression of dfs algorithm,
     // can easily be made into a stream call.
     function lg_depth_first_step(): boolean {
-        if (!is_empty(next_node)) {
-            const node = top(next_node);
+        if (!is_stack_empty(next_node)) {
+            const node = stack_head(next_node);
             next_node = pop(next_node);
             if (node === end) {
                 // TODO: return result
@@ -249,7 +254,6 @@ export function lg_depth_first(
                 },
                 filter((edge_endpoint) => {
                     return exploration_state[edge_endpoint] === initialized;
-                }, graph.adj[node])
                 }, graph.adj[node])
             );
             return true;
@@ -322,7 +326,7 @@ export function lg_breadth_first(
     const path_to_node = Array<Path>(graph.size).fill(null);
 
     // Queue showing what node is next to check.
-    let next_node: Queue<Node> = empty();
+    let next_node: Queue<Node> = empty_queue();
 
     // changes state of node to visisted,
     // adds parent node if one was given else sets it to null.
@@ -337,12 +341,12 @@ export function lg_breadth_first(
     }
 
     // enqueues the starting node with a empty path
-    path_to_node[start] = lg_breadth_first_visit(start, empty());
+    path_to_node[start] = lg_breadth_first_visit(start, empty_queue());
 
     // Stepwise progression of bfs algorithm,
     // can easily be made into a stream call.
     function lg_breadth_first_step(): boolean {
-        if (!is_empty(next_node)) {
+        if (!is_queue_empty(next_node)) {
             const node = queue_head(next_node);
             next_node = dequeue(next_node);
             if (node === end) {
@@ -365,6 +369,7 @@ export function lg_breadth_first(
             return false;
         }
     }
+
     // runs lg_breadth_first_step untill we have either visited all nodes
     // or we are at the goal.
     let running = lg_breadth_first_step();
