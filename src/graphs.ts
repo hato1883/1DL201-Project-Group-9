@@ -1,6 +1,12 @@
 import {
     type Pair, pair, head, tail, type List, is_null, for_each, filter
 } from "../src/list";
+import { Path } from "./path";
+import {
+    Queue, dequeue, enqueue,
+    empty, is_empty,
+    head as queue_head
+} from "./queue_immutable";
 
 
 /**
@@ -144,4 +150,111 @@ export function lg_transpose({ size, adj }: ListGraph): ListGraph {
         for_each((p) => result.adj[p] = pair(i, result.adj[p]), adj[i]);
     }
     return result;
+}
+
+/**
+ * Runs the breadth first serach algorithm to find a path between start and end,
+ * This dose not account for weigthed graphs.
+ * 
+ * @example
+ * ```ts
+ * const listgraph: ListGraph = {
+ *     adj: [
+ *         list(1, 3),    // 0: -> 1, -> 3
+ *         list(2, 5),    // 1: -> 2, -> 5
+ *         list(6),       // 2: -> 6
+ *         list(2, 4, 6), // 3: -> 2, -> 4, -> 6
+ *         list(6),       // 4: -> 6
+ *         list(4, 7),    // 5: -> 4, -> 5
+ *         list(),        // 6:
+ *         list(6)        // 7: -> 6
+ *     ],
+ *     size: 8
+ * };
+ * lg_breadth_first(listgraph, 0, 6);
+ * // results in Queue(0, 3, 6)
+ * // meaing 0 -> 3 -> 6
+ * ```
+ * 
+ * @param graph the unweighted listgraph to perform the breadth first search on.
+ * @param start the starting node to search from
+ * @param end the ending node you want to reach
+ * @returns A Path type conatining either
+ * a Queue<Node> of nodes to visit in order to reach the end 
+ * or null if no path was found from start to end.
+ */
+export function lg_breadth_first(
+    graph: ListGraph,
+    start: Node,
+    end: Node
+): Path {
+    // Exploration states
+    const initialized = 0;
+    const visited = 1;
+
+    // const explored = 2;
+
+    // create a data type to store:
+    // initialized / visited / explored state of each node.
+    const exploration_state = Array(graph.size).fill(initialized);
+
+    // create a data type to store the path to the given node
+    // (Path from `start` node)
+    // All nodes start with a null path meaning there is no path
+    const path_to_node = Array<Path>(graph.size).fill(null);
+
+    // Queue showing what node is next to check.
+    let next_node: Queue<Node> = empty();
+
+    // changes state of node to visisted,
+    // adds parent node if one was given else sets it to null.
+    // enqueues node to queue of nodes to check.
+    function lg_breadth_first_visit(
+        node: Node,
+        path_so_far: Queue<Node>
+    ): Queue<Node> {
+        exploration_state[node] = visited;
+        next_node = enqueue(node, next_node);
+        return enqueue(node, path_so_far);
+    }
+
+    // enqueues the starting node with a empty path
+    path_to_node[start] = lg_breadth_first_visit(start, empty());
+
+    // Stepwise progression of bfs algorithm,
+    // can easily be made into a stream call.
+    function lg_breadth_first_step(): boolean {
+        if (!is_empty(next_node)) {
+            const node = queue_head(next_node);
+            next_node = dequeue(next_node);
+            if (node === end) {
+                // TODO: return result
+                return false;
+            }
+            for_each(
+                (unvisted_node) => {
+                    path_to_node[unvisted_node] = lg_breadth_first_visit(
+                        unvisted_node,
+                        path_to_node[node]
+                    );
+                },
+                filter((edge_endpoint) => {
+                    return exploration_state[edge_endpoint] === initialized;
+                }, graph.adj[node])
+            );
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // runs lg_breadth_first_step untill we have either visited all nodes
+    // or we are at the goal.
+    let running = lg_breadth_first_step();
+    while (running) {
+        // run lg_breadth_first_step untill we are at the end.
+        running = lg_breadth_first_step();
+    }
+
+    return path_to_node[end];
 }
