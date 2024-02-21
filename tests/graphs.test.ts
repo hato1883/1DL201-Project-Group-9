@@ -2,7 +2,8 @@ import {
     undirected, EdgeList,
     MatrixGraph, ListGraph,
     mg_from_edges, mg_new,
-    lg_from_edges, lg_new, lg_transpose, lg_breadth_first
+    lg_from_edges, lg_new, lg_transpose,
+    lg_depth_first, lg_breadth_first
 } from "../src/graphs";
 import { list } from "../src/list";
 import { Queue } from "../src/queue_immutable";
@@ -450,6 +451,7 @@ test("test transposing a list graph", () => {
     );
 });
 
+
 const a = 0;
 const b = 1;
 const c = 2;
@@ -472,7 +474,7 @@ const listgraph: ListGraph = {
     size: 8
 };
 
-test("test listgraph bfs", () => {
+test("test listgraph breadth first search", () => {
     expect(
         lg_breadth_first(
             {
@@ -644,6 +646,226 @@ test("test listgraph bfs", () => {
 
     expect(
         lg_breadth_first(listgraph, a, e)
+    ).toStrictEqual(
+        [a, [d, [e, null]]] as Queue<number>
+    );
+});
+
+
+test("test listgraph depth first search", () => {
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(a)
+                    ],
+                size: 2
+            } as ListGraph,
+            a,
+            b
+        )
+    ).toStrictEqual(
+        [a, [b, null]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c),
+                        list(a)
+                    ],
+                size: 3
+            } as ListGraph,
+            a,
+            c
+        )
+    ).toStrictEqual(
+        [a, [b, [c, null]]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c),
+                        list(a)
+                    ],
+                size: 3
+            } as ListGraph,
+            b,
+            c
+        )
+    ).toStrictEqual(
+        [b, [c, null]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c),
+                        list()
+                    ],
+                size: 3
+            } as ListGraph,
+            c,
+            b
+        )
+    ).toStrictEqual(
+        null
+    );
+
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c, a),
+                        list(a, b)
+                    ],
+                size: 3
+            } as ListGraph,
+            c,
+            b
+        )
+    ).toStrictEqual(
+        [c, [b, null]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c, d),
+                        list(e),
+                        list(e),
+                        list()
+                    ],
+                size: 5
+            } as ListGraph,
+            a,
+            e
+        )
+    ).toStrictEqual(
+        [a, [b, [d, [e, null]]]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c, d),
+                        list(e, f),
+                        list(e),
+                        list(f),
+                        list()
+                    ],
+                size: 6
+            } as ListGraph,
+            a,
+            f
+        )
+    ).toStrictEqual(
+        [a, [b, [d, [e, [f, null]]]]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c, d),
+                        list(e),
+                        list(e, f),
+                        list(f),
+                        list()
+                    ],
+                size: 6
+            } as ListGraph,
+            a,
+            f
+        )
+    ).toStrictEqual(
+        [a, [b, [d, [f, null]]]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(b, f),
+                        list(c),
+                        list(b),
+                        list(c),
+                        list(d),
+                        list(e)
+                    ],
+                size: 6
+            } as ListGraph,
+            a,
+            c
+        )
+    ).toStrictEqual(
+        [a, [f, [e, [d, [c, null]]]]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(
+            {
+                adj:
+                    [
+                        list(f, b),
+                        list(c),
+                        list(b),
+                        list(c),
+                        list(d),
+                        list(e)
+                    ],
+                size: 6
+            } as ListGraph,
+            a,
+            c
+        )
+    ).toStrictEqual(
+        [a, [b, [c, null]]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(listgraph, a, g)
+    ).toStrictEqual(
+        [a, [d, [g, null]]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(listgraph, a, h)
+    ).toStrictEqual(
+        [a, [b, [f, [h, null]]]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(listgraph, a, c)
+    ).toStrictEqual(
+        [a, [d, [c, null]]] as Queue<number>
+    );
+
+    expect(
+        lg_depth_first(listgraph, a, e)
     ).toStrictEqual(
         [a, [d, [e, null]]] as Queue<number>
     );
