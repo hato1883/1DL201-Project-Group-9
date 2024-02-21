@@ -293,16 +293,20 @@ export function lg_depth_first(
  *     size: 8
  * };
  * lg_breadth_first(listgraph, 0, 6);
- * // results in Queue(0, 3, 6)
+ * // results in Queue(0, 3, 6) after evaluating the stream
  * // meaing 0 -> 3 -> 6
  * ```
  * 
  * @param graph the unweighted listgraph to perform the breadth first search on.
  * @param start the starting node to search from
  * @param end the ending node you want to reach
- * @returns A Path type conatining either
- * a Queue<Node> of nodes to visit in order to reach the end 
- * or null if no path was found from start to end.
+ * @returns A Stream<Result> information regarding
+ * the algorithms path thru the graph. It also contains
+ * the path so far put this path can lead to a postion far away from the
+ * end point. to get a path to the end you need to evaluate the stream
+ * utill the is_done porpertie has evaluated to true.
+ * when is_done is set to true you will have a path from start to end
+ * if such a path exists.
  */
 export function lg_breadth_first(
     graph: ListGraph,
@@ -317,7 +321,7 @@ export function lg_breadth_first(
 
     // create a data type to store:
     // initialized / visited / explored state of each node.
-    const exploration_state = Array(graph.size).fill(initialized);
+    const exploration_state = Array<number>(graph.size).fill(initialized);
 
     // create a data type to store the path to the given node
     // (Path from `start` node)
@@ -351,7 +355,7 @@ export function lg_breadth_first(
             if (node === end) {
                 return {
                     in_queue: next_node,
-                    visited_nodes: Array<Node>(),
+                    visited_nodes: exploration_state,
                     current_node: node,
                     path_so_far: path_to_node[node],
                     is_done: true
@@ -380,7 +384,7 @@ export function lg_breadth_first(
 
             return {
                 in_queue: next_node,
-                visited_nodes: visited_nodes_this_loop,
+                visited_nodes: exploration_state,
                 current_node: node,
                 path_so_far: path_to_node[node],
                 is_done: false
@@ -388,7 +392,7 @@ export function lg_breadth_first(
         } else {
             return {
                 in_queue: next_node,
-                visited_nodes: [],
+                visited_nodes: exploration_state,
                 current_node: -1,
                 path_so_far: path_to_node[end],
                 is_done: true

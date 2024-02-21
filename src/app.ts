@@ -138,45 +138,34 @@ let mili_seconds = 0;
 const graph = maze_to_listgraph(maze);
 let breadth_stream = lg_breadth_first(graph, 1, 47);
 
-let in_queue = head(breadth_stream).in_queue;
-while (!is_empty(in_queue)) {
-    let pos = deepen_index(head_of_queue(in_queue), maze);
-    if (pos !== undefined) {
-        // cyan
-        textures[pos.row][pos.col].tint = 0x34ebb7;
-    }
-    in_queue = dequeue(in_queue);
-}
-
 function draw(): void {
     console.log("Drawing...");
 
-    textures = init_teture_array(maze.matrix);
+    // Draw all visited nodes
+    let visited = head(breadth_stream).visited_nodes;
+    console.log("Recived node states:", visited);
+    visited.forEach((node, index) => {
+        if (node === 1) {
+            let pos = deepen_index(index, maze);
+            if (pos !== undefined) {
+                // grå
+                textures[pos.row][pos.col].tint = 0xb0acb0;
+            }
+        }
+    });
 
-    const stream_tail = tail(breadth_stream);
-    if (!is_null(stream_tail)) {
-        breadth_stream = stream_tail();
-    }
-
-    in_queue = head(breadth_stream).in_queue;
+    // Draw all nodes pending a visit from algorithm
+    let in_queue = head(breadth_stream).in_queue;
     while (!is_empty(in_queue)) {
         let pos = deepen_index(head_of_queue(in_queue), maze);
         if (pos !== undefined) {
-            // ljusare cyan / grön
+            // ljusare cyan
             textures[pos.row][pos.col].tint = 0x34ebb7;
         }
         in_queue = dequeue(in_queue);
     }
 
-    let visited = head(breadth_stream).visited_nodes;
-    visited.forEach((node) => {
-        let pos = deepen_index(node, maze);
-        if (pos !== undefined) {
-            // grå
-            textures[pos.row][pos.col].tint = 0xb0acb0;
-        }
-    });
-
+    // Draw the path taken to reach the current node
     let current_path = head(breadth_stream).path_so_far;
     while (!is_empty(current_path)) {
         let pos = deepen_index(head_of_queue(current_path), maze);
@@ -192,6 +181,7 @@ function draw(): void {
         current_path = dequeue(current_path);
     }
 
+    // Draw the current node
     let current_node = deepen_index(
         head(breadth_stream).current_node,
         maze
@@ -199,6 +189,12 @@ function draw(): void {
     if (current_node !== undefined) {
         // lila
         textures[current_node.row][current_node.col].tint = 0xd534eb;
+    }
+
+    // Take the next step of the algorithm
+    const stream_tail = tail(breadth_stream);
+    if (!is_null(stream_tail)) {
+        breadth_stream = stream_tail();
     }
 }
 
