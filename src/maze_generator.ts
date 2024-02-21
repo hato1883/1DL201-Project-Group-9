@@ -5,8 +5,8 @@ import { Maze, MazeBlock } from "./maze";
 
 function generate_maze(w: number, h: number, seed?: number): Maze {
     function seeded_random(input: number): [number, number] {
-        return [1, 2]
-    };
+        return [1, 2];
+    }
 
     if (seed === undefined) {
         return {
@@ -14,9 +14,7 @@ function generate_maze(w: number, h: number, seed?: number): Maze {
             height: h,
             matrix: [[true]]
         };
-    }
-
-    else {
+    } else {
         const seeded_value = seeded_random(seed);
 
         return {
