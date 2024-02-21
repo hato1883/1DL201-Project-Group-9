@@ -105,7 +105,7 @@ function init_teture_array(
             result[row][col] = new pixi.Sprite(pixi.Texture.WHITE);
             switch (cell) {
             case maze_wall:
-                result[row][col].tint = 0xa0a0a0;
+                result[row][col].tint = 0x000000;
                 break;
 
             case not_visited:
