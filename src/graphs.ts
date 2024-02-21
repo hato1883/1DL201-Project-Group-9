@@ -200,7 +200,7 @@ export function lg_depth_first(
     graph: ListGraph,
     start: Node,
     end: Node
-): Path {
+): Stream<Result> {
     // Exploration states
     const initialized = 0;
     const visited = 1;
@@ -209,7 +209,7 @@ export function lg_depth_first(
 
     // create a data type to store:
     // initialized / visited / explored state of each node.
-    const exploration_state = Array(graph.size).fill(initialized);
+    const exploration_state = Array<number>(graph.size).fill(initialized);
 
     // create a data type to store the path to the given node
     // (Path from `start` node)
@@ -237,14 +237,27 @@ export function lg_depth_first(
 
     // Stepwise progression of dfs algorithm,
     // can easily be made into a stream call.
-    function lg_depth_first_step(): boolean {
+    function lg_depth_first_step(): Result {
         if (!is_stack_empty(next_node)) {
             const node = stack_head(next_node);
             next_node = pop(next_node);
             if (node === end) {
-                // TODO: return result
-                return false;
+                return {
+                    in_queue: next_node,
+                    visited_nodes: exploration_state,
+                    current_node: node,
+                    path_so_far: path_to_node[node],
+                    is_done: true
+                };
             }
+
+            const non_visited = filter(
+                (edge_endpoint) => {
+                    return exploration_state[edge_endpoint] === initialized;
+                },
+                graph.adj[node]
+            );
+
             for_each(
                 (unvisted_node) => {
                     path_to_node[unvisted_node] = lg_depth_first_visit(
@@ -252,25 +265,54 @@ export function lg_depth_first(
                         path_to_node[node]
                     );
                 },
-                filter((edge_endpoint) => {
-                    return exploration_state[edge_endpoint] === initialized;
-                }, graph.adj[node])
+                non_visited
             );
-            return true;
+
+            const visited_nodes_this_loop = Array<Node>();
+            for_each((node) => visited_nodes_this_loop.push(node), non_visited);
+
+            return {
+                in_queue: next_node,
+                visited_nodes: exploration_state,
+                current_node: node,
+                path_so_far: path_to_node[node],
+                is_done: false
+            };
         } else {
-            return false;
+            return {
+                in_queue: next_node,
+                visited_nodes: exploration_state,
+                current_node: -1,
+                path_so_far: path_to_node[end],
+                is_done: true
+            };
         }
     }
 
-    // runs lg_depth_first_step untill we have either visited all nodes
-    // or we are at the goal.
-    let running = lg_depth_first_step();
-    while (running) {
-        // run lg_depth_first_step untill we are at the end.
-        running = lg_depth_first_step();
+    // Initialize stream with only starting node in the stack
+    const stream: Stream<Result> = pair(
+        {
+            in_queue: next_node,
+            visited_nodes: Array<Node>(),
+            current_node: -1,
+            path_so_far: null,
+            is_done: false
+        },
+        () => data_stream()
+    );
+
+    // runs a single step of the algorithm and returns the state.
+    // paired with a refrence toi this function to get the next state.
+    // lazy evaluation
+    function data_stream(): Stream<Result> {
+        const result = lg_depth_first_step();
+        return pair(
+            result,
+            result.is_done ? null : data_stream
+        );
     }
 
-    return path_to_node[end];
+    return stream;
 }
 
 /**
