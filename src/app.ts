@@ -1,104 +1,102 @@
 import * as pixi from "pixi.js";
+import { Free, Maze, MazeBlock, Wall, deepen_index, maze_to_listgraph } from "./maze";
+import { lg_breadth_first } from "./graphs";
+import { head, is_null, tail } from "./list";
+import { is_empty, head as head_of_queue, dequeue } from "./queue_immutable";
 
 const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
 
-const maze_wall = 0;
-const not_visited = 1;
-const visited = 2;
-const queued = 3;
-const next_in_queue = 4;
+const maze_wall: Wall = false;
+const not_visited: Free = true;
 
-enum State {
-    maze_wall,
-    not_visited,
-    visited,
-    queued,
-    next_in_queue
-}
-
-const maze = [
-    [
-        maze_wall,
-        not_visited,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited,
-        not_visited,
-        maze_wall,
-        not_visited
-    ],
-    [
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited
-    ],
-    [
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited,
-        not_visited,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        not_visited,
-        maze_wall,
-        maze_wall,
-        not_visited,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        not_visited,
-        not_visited,
-        maze_wall,
-        not_visited,
-        not_visited,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall
+const maze: Maze = {
+    width: 7,
+    height: 8,
+    matrix: [
+        [
+            maze_wall,
+            not_visited,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            not_visited,
+            not_visited,
+            not_visited,
+            not_visited,
+            maze_wall,
+            not_visited
+        ],
+        [
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            not_visited,
+            not_visited,
+            not_visited
+        ],
+        [
+            maze_wall,
+            not_visited,
+            not_visited,
+            not_visited,
+            not_visited,
+            maze_wall,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            not_visited,
+            maze_wall,
+            maze_wall,
+            not_visited,
+            maze_wall,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            maze_wall,
+            not_visited,
+            not_visited,
+            not_visited,
+            maze_wall,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            not_visited,
+            not_visited,
+            maze_wall,
+            not_visited,
+            not_visited,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall
+        ]
     ]
-];
-const cell_height = app.screen.height / maze.length;
-const cell_width = app.screen.width / maze[0].length;
+};
+
+const cell_height = app.screen.height / maze.height;
+const cell_width = app.screen.width / maze.width;
 
 // sometinh ~2 days
 // other [optional] ~3 days
 
 function init_teture_array(
-    maze: Array<Array<State>>
+    maze: Array<Array<MazeBlock>>
 ): Array<Array<pixi.Sprite>> {
     const result = Array<Array<pixi.Sprite>>(maze.length);
     maze.forEach((maze_row, row) => {
@@ -112,18 +110,6 @@ function init_teture_array(
 
             case not_visited:
                 result[row][col].tint = 0xffffff;
-                break;
-
-            case visited:
-                result[row][col].tint = 0xc4c4c4;
-                break;
-
-            case queued:
-                result[row][col].tint = 0x3bf7f1;
-                break;
-
-            case next_in_queue:
-                result[row][col].tint = 0xf7b63b;
                 break;
 
             default:
@@ -146,53 +132,81 @@ function init_teture_array(
 // create sprite from url
 // const bunny = pixi.Sprite.from("https://pixijs.com/assets/bunny.png");
 
-const textures = init_teture_array(maze);
-console.log(textures);
+let textures = init_teture_array(maze.matrix);
 
-let seconds = 0;
+let mili_seconds = 0;
+const graph = maze_to_listgraph(maze);
+let breadth_stream = lg_breadth_first(graph, 1, 47);
 
-// Listen for animate update
-let row = 3;
-let col = 3;
-app.ticker.add(() => {
-    seconds += app.ticker.deltaMS;
-    if (seconds >= 500) {
-        const old_tint = textures[row][col].tint;
-        textures[row][col].tint = 0xf00f0;
-        seconds = 0;
-        console.log("Randoming");
-        let new_row = 0;
-        let new_col = 0;
-        while (maze[new_row][new_col] === maze_wall) {
-            new_col = col;
-            new_row = row;
-            if (Math.random() > 0.5) {
-                new_row = Math.max(
-                    Math.min(
-                        row + (Math.round(Math.random()) === 0 ? -1 : 1),
-                        maze.length - 1
-                    ),
-                    0
-                );
+let in_queue = head(breadth_stream).in_queue;
+while (!is_empty(in_queue)) {
+    let pos = deepen_index(head_of_queue(in_queue), maze);
+    if (pos !== undefined) {
+        // cyan
+        textures[pos.row][pos.col].tint = 0x34ebb7;
+    }
+    in_queue = dequeue(in_queue);
+}
+
+function draw(): void {
+    console.log("Drawing...");
+
+    textures = init_teture_array(maze.matrix);
+
+    const stream_tail = tail(breadth_stream);
+    if (!is_null(stream_tail)) {
+        breadth_stream = stream_tail();
+    }
+
+    in_queue = head(breadth_stream).in_queue;
+    while (!is_empty(in_queue)) {
+        let pos = deepen_index(head_of_queue(in_queue), maze);
+        if (pos !== undefined) {
+            // ljusare cyan / grön
+            textures[pos.row][pos.col].tint = 0x34ebb7;
+        }
+        in_queue = dequeue(in_queue);
+    }
+
+    let visited = head(breadth_stream).visited_nodes;
+    visited.forEach((node) => {
+        let pos = deepen_index(node, maze);
+        if (pos !== undefined) {
+            // grå
+            textures[pos.row][pos.col].tint = 0xb0acb0;
+        }
+    });
+
+    let current_path = head(breadth_stream).path_so_far;
+    while (!is_empty(current_path)) {
+        let pos = deepen_index(head_of_queue(current_path), maze);
+        if (pos !== undefined) {
+            if (head(breadth_stream).is_done) {
+                // grön
+                textures[pos.row][pos.col].tint = 0x00ff2f;
             } else {
-                new_col = Math.max(
-                    Math.min(
-                        col + (Math.round(Math.random()) === 0 ? -1 : 1),
-                        maze[row].length - 1
-                    ),
-                    0
-                );
+                // gul
+                textures[pos.row][pos.col].tint = 0xe8c100;
             }
         }
+        current_path = dequeue(current_path);
+    }
 
-        row = new_row;
-        col = new_col;
-        textures[row][col].tint = old_tint;
-        console.log("row: %d,  col: ", row, col);
-        if (maze[row][col] === not_visited) {
-            maze[row][col] = visited;
-            textures[row][col].tint = 0xff0000;
-        }
+    let current_node = deepen_index(
+        head(breadth_stream).current_node,
+        maze
+    );
+    if (current_node !== undefined) {
+        // lila
+        textures[current_node.row][current_node.col].tint = 0xd534eb;
+    }
+}
+
+app.ticker.add(() => {
+    mili_seconds += app.ticker.deltaMS;
+    if (mili_seconds >= 1000) {
+        mili_seconds = 0;
+        draw();
     }
 
     // just for fun, let's rotate mr rabbit a little
