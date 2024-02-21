@@ -400,6 +400,7 @@ export function lg_breadth_first(
         }
     }
 
+    // Initialize stream with only starting node in the queue
     const stream: Stream<Result> = pair(
         {
             in_queue: next_node,
@@ -420,14 +421,4 @@ export function lg_breadth_first(
     }
 
     return stream;
-
-    // pair(värde, funktion -> pair(värde, funktion -> ... ))
-    //
-
-    // 1: vad som är i kön just nu,
-    // 2: besökt noder,
-    // 3: nuvarande node
-    // 4: nuvarande path
-    // 5: är klar?
-    // { in_queue: 1, 2, 3, 4, visited: start }
 }
