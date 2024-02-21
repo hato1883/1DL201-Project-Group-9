@@ -5,7 +5,8 @@ import {
     lg_from_edges, lg_new, lg_transpose,
     lg_depth_first, lg_breadth_first
 } from "../src/graphs";
-import { list } from "../src/list";
+import { head, is_null, list, tail } from "../src/list";
+import { Result, Stream } from "../src/path";
 import { Queue } from "../src/queue_immutable";
 
 
@@ -474,8 +475,21 @@ const listgraph: ListGraph = {
     size: 8
 };
 
+function eval_breadth_first_stream(stream: Stream<Result>): Result {
+    let return_value = stream;
+    while (!head(return_value).is_done) {
+        let stream_tail = tail(return_value);
+        if (!is_null(stream_tail)) {
+            return_value = stream_tail();
+        } else {
+            return head(return_value);
+        }
+    }
+    return head(return_value);
+}
+
 test("test listgraph breadth first search", () => {
-    expect(
+    let result: Result = eval_breadth_first_stream(
         lg_breadth_first(
             {
                 adj:
@@ -488,11 +502,15 @@ test("test listgraph breadth first search", () => {
             a,
             b
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, null]] as Queue<number>
     );
 
-    expect(
+    result = eval_breadth_first_stream(
         lg_breadth_first(
             {
                 adj:
@@ -506,11 +524,15 @@ test("test listgraph breadth first search", () => {
             a,
             c
         )
+    );
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [c, null]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(
             {
                 adj:
@@ -524,11 +546,15 @@ test("test listgraph breadth first search", () => {
             b,
             c
         )
+    );
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [b, [c, null]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(
             {
                 adj:
@@ -542,11 +568,16 @@ test("test listgraph breadth first search", () => {
             c,
             b
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         null
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(
             {
                 adj:
@@ -560,11 +591,16 @@ test("test listgraph breadth first search", () => {
             c,
             b
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [c, [b, null]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(
             {
                 adj:
@@ -580,11 +616,16 @@ test("test listgraph breadth first search", () => {
             a,
             e
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [c, [e, null]]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(
             {
                 adj:
@@ -601,11 +642,16 @@ test("test listgraph breadth first search", () => {
             a,
             f
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [c, [f, null]]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(
             {
                 adj:
@@ -622,30 +668,54 @@ test("test listgraph breadth first search", () => {
             a,
             f
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [d, [f, null]]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(listgraph, a, g)
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [d, [g, null]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(listgraph, a, h)
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [f, [h, null]]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(listgraph, a, c)
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [c, null]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_breadth_first_stream(
         lg_breadth_first(listgraph, a, e)
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [d, [e, null]]] as Queue<number>
     );

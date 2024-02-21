@@ -1,7 +1,7 @@
 import {
     type Pair, pair, head, tail, type List, is_null, for_each, filter
 } from "../src/list";
-import { Path } from "./path";
+import { Path, Result, Stream } from "./path";
 import {
     Stack, pop, push,
     empty as empty_stack,
@@ -273,7 +273,6 @@ export function lg_depth_first(
     return path_to_node[end];
 }
 
-
 /**
  * Runs the breadth first serach algorithm to find a path between start and end,
  * This dose not account for weigthed graphs.
@@ -309,7 +308,7 @@ export function lg_breadth_first(
     graph: ListGraph,
     start: Node,
     end: Node
-): Path {
+): Stream<Result> {
     // Exploration states
     const initialized = 0;
     const visited = 1;
@@ -345,14 +344,27 @@ export function lg_breadth_first(
 
     // Stepwise progression of bfs algorithm,
     // can easily be made into a stream call.
-    function lg_breadth_first_step(): boolean {
+    function lg_breadth_first_step(): Result {
         if (!is_queue_empty(next_node)) {
             const node = queue_head(next_node);
             next_node = dequeue(next_node);
             if (node === end) {
-                // TODO: return result
-                return false;
+                return {
+                    in_queue: next_node,
+                    visited_nodes: Array<Node>(),
+                    current_node: node,
+                    path_so_far: path_to_node[node],
+                    is_done: true
+                };
             }
+
+            const non_visited = filter(
+                (edge_endpoint) => {
+                    return exploration_state[edge_endpoint] === initialized;
+                },
+                graph.adj[node]
+            );
+
             for_each(
                 (unvisted_node) => {
                     path_to_node[unvisted_node] = lg_breadth_first_visit(
@@ -360,23 +372,58 @@ export function lg_breadth_first(
                         path_to_node[node]
                     );
                 },
-                filter((edge_endpoint) => {
-                    return exploration_state[edge_endpoint] === initialized;
-                }, graph.adj[node])
+                non_visited
             );
-            return true;
+
+            const visited_nodes_this_loop = Array<Node>();
+            for_each((node) => visited_nodes_this_loop.push(node), non_visited);
+
+            return {
+                in_queue: next_node,
+                visited_nodes: visited_nodes_this_loop,
+                current_node: node,
+                path_so_far: path_to_node[node],
+                is_done: false
+            };
         } else {
-            return false;
+            return {
+                in_queue: next_node,
+                visited_nodes: [],
+                current_node: -1,
+                path_so_far: path_to_node[end],
+                is_done: true
+            };
         }
     }
 
-    // runs lg_breadth_first_step untill we have either visited all nodes
-    // or we are at the goal.
-    let running = lg_breadth_first_step();
-    while (running) {
-        // run lg_breadth_first_step untill we are at the end.
-        running = lg_breadth_first_step();
+    const stream: Stream<Result> = pair(
+        {
+            in_queue: next_node,
+            visited_nodes: Array<Node>(),
+            current_node: -1,
+            path_so_far: null,
+            is_done: false
+        },
+        () => data_stream()
+    );
+
+    function data_stream(): Stream<Result> {
+        const result = lg_breadth_first_step();
+        return pair(
+            result,
+            result.is_done ? null : data_stream
+        );
     }
 
-    return path_to_node[end];
+    return stream;
+
+    // pair(värde, funktion -> pair(värde, funktion -> ... ))
+    //
+
+    // 1: vad som är i kön just nu,
+    // 2: besökt noder,
+    // 3: nuvarande node
+    // 4: nuvarande path
+    // 5: är klar?
+    // { in_queue: 1, 2, 3, 4, visited: start }
 }
