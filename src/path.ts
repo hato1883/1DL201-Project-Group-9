@@ -11,11 +11,11 @@ export type Path = Queue<Node> | null;
 // 5: är klar?
 // { in_queue: 1, 2, 3, 4, visited: start }
 export type Result = {
-    in_queue: Queue<Node>;
-    visited_nodes: Array<Node>;
-    current_node: Node;
-    path_so_far: Path;
-    is_done: boolean;
+    readonly in_queue: Queue<Node>;
+    readonly visited_nodes: Array<Node>;
+    readonly current_node: Node;
+    readonly path_so_far: Path;
+    readonly is_done: boolean;
 };
 
 export type Stream<T> = Pair<T, (() => Stream<T>) | null>;
