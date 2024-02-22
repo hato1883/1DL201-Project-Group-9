@@ -475,7 +475,7 @@ const listgraph: ListGraph = {
     size: 8
 };
 
-function eval_breadth_first_stream(stream: Stream<Result>): Result {
+function eval_stream(stream: Stream<Result>): Result {
     let return_value = stream;
     while (!head(return_value).is_done) {
         let stream_tail = tail(return_value);
@@ -489,7 +489,7 @@ function eval_breadth_first_stream(stream: Stream<Result>): Result {
 }
 
 test("test listgraph breadth first search", () => {
-    let result: Result = eval_breadth_first_stream(
+    let result: Result = eval_stream(
         lg_breadth_first(
             {
                 adj:
@@ -510,7 +510,7 @@ test("test listgraph breadth first search", () => {
         [a, [b, null]] as Queue<number>
     );
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(
             {
                 adj:
@@ -532,7 +532,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(
             {
                 adj:
@@ -554,7 +554,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(
             {
                 adj:
@@ -577,7 +577,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(
             {
                 adj:
@@ -600,7 +600,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(
             {
                 adj:
@@ -625,7 +625,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(
             {
                 adj:
@@ -651,7 +651,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(
             {
                 adj:
@@ -677,7 +677,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(listgraph, a, g)
     );
 
@@ -688,7 +688,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(listgraph, a, h)
     );
 
@@ -699,7 +699,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(listgraph, a, c)
     );
 
@@ -710,7 +710,7 @@ test("test listgraph breadth first search", () => {
     );
 
 
-    result = eval_breadth_first_stream(
+    result = eval_stream(
         lg_breadth_first(listgraph, a, e)
     );
 
@@ -723,7 +723,7 @@ test("test listgraph breadth first search", () => {
 
 
 test("test listgraph depth first search", () => {
-    expect(
+    let result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -736,11 +736,15 @@ test("test listgraph depth first search", () => {
             a,
             b
         )
+    );
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, null]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -754,11 +758,15 @@ test("test listgraph depth first search", () => {
             a,
             c
         )
+    );
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [c, null]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -772,11 +780,16 @@ test("test listgraph depth first search", () => {
             b,
             c
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [b, [c, null]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -790,11 +803,16 @@ test("test listgraph depth first search", () => {
             c,
             b
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         null
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -808,11 +826,16 @@ test("test listgraph depth first search", () => {
             c,
             b
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [c, [b, null]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -828,11 +851,16 @@ test("test listgraph depth first search", () => {
             a,
             e
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [d, [e, null]]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -849,11 +877,16 @@ test("test listgraph depth first search", () => {
             a,
             f
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [d, [e, [f, null]]]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -870,11 +903,16 @@ test("test listgraph depth first search", () => {
             a,
             f
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [d, [f, null]]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -891,11 +929,16 @@ test("test listgraph depth first search", () => {
             a,
             c
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [f, [e, [d, [c, null]]]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(
             {
                 adj:
@@ -912,30 +955,54 @@ test("test listgraph depth first search", () => {
             a,
             c
         )
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [c, null]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(listgraph, a, g)
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [d, [g, null]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(listgraph, a, h)
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [b, [f, [h, null]]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(listgraph, a, c)
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [d, [c, null]]] as Queue<number>
     );
 
-    expect(
+
+    result = eval_stream(
         lg_depth_first(listgraph, a, e)
+    );
+
+    expect(
+        result.path_so_far
     ).toStrictEqual(
         [a, [d, [e, null]]] as Queue<number>
     );
