@@ -2,7 +2,7 @@ import { generate_maze } from "../src/maze_generator";
 import { Maze,free } from "../src/maze";
 
 
-test('Is there a maze returned?', () => {
+test('Is there a solvable 1x1 maze returned?', () => {
     expect(generate_maze(1)).toStrictEqual(
     {
         width: 1,
