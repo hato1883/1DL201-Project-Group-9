@@ -93,7 +93,7 @@ const maze: Maze = {
 // sometinh ~2 days
 // other [optional] ~3 days
 
-function init_teture_array(
+function init_texture_array(
     maze: Maze,
     container: pixi.Container,
     width: number,
@@ -152,7 +152,7 @@ let container = new pixi.Container();
 
 // Create the record holding textures and the algorithm
 let breadth_algorithm = {
-    textures: init_teture_array(
+    textures: init_texture_array(
         maze,
         container,
         app.renderer.width / 2,
@@ -176,7 +176,7 @@ container.x = app.screen.width / 2;
 
 // Create the record holding textures and the algorithm
 let depth_algorithm = {
-    textures: init_teture_array(
+    textures: init_texture_array(
         maze,
         container,
         app.renderer.width / 2,
