@@ -426,4 +426,3 @@ export function fold_left<T, U>(
 export function flatten<T>(xss: List<List<T>>): List<T> {
     return accumulate(append, empty_list<T>(), xss);
 }
-
