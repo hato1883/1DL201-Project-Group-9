@@ -3,7 +3,7 @@
  * returns and returns a object containing diffrent function calls.
  * 
  */
-function splitmix32(a: number): {
+export function splitmix32(a: number): {
   random: () => number;
   random_int: (min?: number, max?: number) => number;
   random_float: (min?: number, max?: number) => number;
@@ -34,8 +34,3 @@ function splitmix32(a: number): {
     random_bool: random_bool,
   };
 }
-const psuedo_random = splitmix32(10);
-console.log(psuedo_random.random_bool());
-console.log(psuedo_random.random_bool());
-console.log(psuedo_random.random_bool());
-console.log(psuedo_random.random_bool());
