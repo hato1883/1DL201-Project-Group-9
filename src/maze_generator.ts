@@ -8,7 +8,7 @@ import {
     push, pop, top, is_empty
 } from "./stack";
 import { splitmix32 } from "./psuedo_random";
-import { filter, length, list_ref, to_string } from "./list";
+import { filter, length, list_ref } from "./list";
 
 // An algorithm that uses the recursive division method specified here
 // eslint-disable-next-line @stylistic/max-len
@@ -52,15 +52,14 @@ export function iterative_maze_generation(side: number, seed = 42): Maze {
         matrix[r_index] = Array<MazeBlock>((maze.width * 2) + 1);
         for (let c_index = 0; c_index < (maze.width * 2) + 1; c_index++) {
             if (r_index % 2 === 0) {
-                matrix[r_index][c_index] = false;
+                matrix[r_index][c_index] = wall;
             } else if (c_index % 2 === 0) {
-                matrix[r_index][c_index] = false;
+                matrix[r_index][c_index] = wall;
             } else {
-                matrix[r_index][c_index] = true;
+                matrix[r_index][c_index] = free;
             }
         }
     }
-    console.log("init matrix:", matrix);
 
     const result_maze: Maze = {
         width: (maze.width * 2) + 1,
@@ -72,19 +71,16 @@ export function iterative_maze_generation(side: number, seed = 42): Maze {
     //   O O O
     //   O O O
     function remove_wall(st_node: number, nd_node: number): void {
-        let target_col = ((((st_node % 3) * 2) + 1)
-            - ((st_node % 3) - (nd_node % 3)));
+        let target_col = ((((st_node % side) * 2) + 1)
+            - ((st_node % side) - (nd_node % side)));
         while (target_col >= result_maze.width) {
             target_col -= result_maze.width;
         }
-        let target_row = (((Math.floor(st_node / 3) * 2) + 1)
-            - (Math.floor(st_node / 3) - Math.floor(nd_node / 3)));
+        let target_row = (((Math.floor(st_node / side) * 2) + 1)
+            - (Math.floor(st_node / side) - Math.floor(nd_node / side)));
         while (target_col >= result_maze.width) {
             target_col -= result_maze.width;
         }
-        console.log("Removing wall between: ", st_node, ", ", nd_node);
-        // eslint-disable-next-line @stylistic/max-len
-        console.log("by setting index [", target_row, "][", target_col, "] to free");
         result_maze.matrix[target_row][target_col] = free;
     }
 
@@ -125,9 +121,7 @@ export function iterative_maze_generation(side: number, seed = 42): Maze {
             (edge_endpoint) => exploration_state[edge_endpoint] === initialized,
             unconnected_maze.adj[current_cell]
         );
-        console.log(to_string(unvisted_neighbours));
         const num_unvisited = length(unvisted_neighbours);
-        console.log(num_unvisited);
 
         // 2.2 If the current cell has any unvisited neighbours
         if (num_unvisited > 0) {
@@ -174,6 +168,3 @@ export function iterative_maze_generation(side: number, seed = 42): Maze {
 
     return result_maze;
 }
-
-
-console.log(iterative_maze_generation(3));
