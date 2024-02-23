@@ -92,7 +92,7 @@ const maze = [
     ]
 ];
 const cell_height = app.screen.height / maze.length;
-const cell_width = app.screen.width / maze[0].length;
+const cell_width = app.screen.height / maze[0].length;
 
 // sometinh ~2 days
 // other [optional] ~3 days
