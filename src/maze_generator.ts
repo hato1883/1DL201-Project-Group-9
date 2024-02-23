@@ -72,26 +72,30 @@ export function iterative_maze_generation(side: number, seed = 42): Maze {
     //   O O O
     //   O O O
     function remove_wall(st_node: number, nd_node: number): void {
-        let target_col = (((st_node * 2) + 1) - (st_node - nd_node));
+        let target_col = ((((st_node % 3) * 2) + 1)
+            - ((st_node % 3) - (nd_node % 3)));
         while (target_col >= result_maze.width) {
             target_col -= result_maze.width;
         }
-        let target_row = ((((st_node % 3) * 2) + 1) - (st_node - nd_node));
+        let target_row = (((Math.floor(st_node / 3) * 2) + 1)
+            - (Math.floor(st_node / 3) - Math.floor(nd_node / 3)));
         while (target_col >= result_maze.width) {
             target_col -= result_maze.width;
         }
-        console.log("Placing path at: ", target_row, " ", target_col);
+        console.log("Removing wall between: ", st_node, ", ", nd_node);
+        // eslint-disable-next-line @stylistic/max-len
+        console.log("by setting index [", target_row, "][", target_col, "] to free");
         result_maze.matrix[target_row][target_col] = free;
     }
 
-    // J
-    // I# # # # # # #
-    // # O # O # O # [0][0] - start index
-    // # # # # # # # [1][0] - tear down the wall
-    // # O # O # O # [2][0] - target index
-    // # # # # # # #
-    // # O # O # O #
-    // # # # # # # #
+    //  0 1 2 3 4 5 6
+    // 0# # # # # # #
+    // 1# O # O # O # [0][0] - start index
+    // 2# # # # # # # [1][0] - tear down the wall
+    // 3# O # O # O # [2][0] - target index
+    // 4# # # # # # #
+    // 5# O # O # O #
+    // 6# # # # # # #
 
     // Exploration states
     const initialized = 0;
