@@ -1,129 +1,119 @@
 import * as pixi from "pixi.js";
+import { Free, Maze, Wall, deepen_index, maze_to_listgraph } from "./maze";
+import { lg_breadth_first, lg_depth_first } from "./graphs";
+import { head, is_null, tail } from "./list";
+import { is_empty, head as head_of_queue, dequeue } from "./queue_immutable";
+import { Result, Stream } from "./path";
 
 const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
 
-const maze_wall = 0;
-const not_visited = 1;
-const visited = 2;
-const queued = 3;
-const next_in_queue = 4;
+const maze_wall: Wall = false;
+const not_visited: Free = true;
 
-enum State {
-    maze_wall,
-    not_visited,
-    visited,
-    queued,
-    next_in_queue
-}
-
-const maze = [
-    [
-        maze_wall,
-        not_visited,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited,
-        not_visited,
-        maze_wall,
-        not_visited
-    ],
-    [
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited
-    ],
-    [
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited,
-        not_visited,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        not_visited,
-        maze_wall,
-        maze_wall,
-        not_visited,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        not_visited,
-        not_visited,
-        maze_wall,
-        not_visited,
-        not_visited,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall
+const maze: Maze = {
+    width: 7,
+    height: 8,
+    matrix: [
+        [
+            maze_wall,
+            not_visited,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            not_visited,
+            not_visited,
+            not_visited,
+            not_visited,
+            maze_wall,
+            not_visited
+        ],
+        [
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            not_visited,
+            not_visited,
+            not_visited
+        ],
+        [
+            maze_wall,
+            not_visited,
+            not_visited,
+            not_visited,
+            not_visited,
+            maze_wall,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            not_visited,
+            maze_wall,
+            maze_wall,
+            not_visited,
+            maze_wall,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            maze_wall,
+            not_visited,
+            not_visited,
+            not_visited,
+            maze_wall,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            not_visited,
+            not_visited,
+            maze_wall,
+            not_visited,
+            not_visited,
+            maze_wall
+        ],
+        [
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall,
+            maze_wall
+        ]
     ]
-];
-const cell_height = app.screen.height / maze.length;
-const cell_width = app.screen.width / maze[0].length;
+};
 
 // sometinh ~2 days
 // other [optional] ~3 days
 
-function init_teture_array(
-    maze: Array<Array<State>>
+function init_texture_array(
+    maze: Maze,
+    container: pixi.Container,
+    width: number,
+    height: number
 ): Array<Array<pixi.Sprite>> {
-    const result = Array<Array<pixi.Sprite>>(maze.length);
-    maze.forEach((maze_row, row) => {
-        result[row] = Array<pixi.Sprite>(maze_row.length);
+    const cell_height = (width) / maze.height;
+    const cell_width = (height) / maze.width;
+
+    const result = Array<Array<pixi.Sprite>>(maze.height);
+    maze.matrix.forEach((maze_row, row) => {
+        result[row] = Array<pixi.Sprite>(maze.width);
         maze_row.forEach((cell, col) => {
             result[row][col] = new pixi.Sprite(pixi.Texture.WHITE);
             switch (cell) {
             case maze_wall:
-                result[row][col].tint = 0xa0a0a0;
+                result[row][col].tint = 0x000000;
                 break;
 
             case not_visited:
                 result[row][col].tint = 0xffffff;
-                break;
-
-            case visited:
-                result[row][col].tint = 0xc4c4c4;
-                break;
-
-            case queued:
-                result[row][col].tint = 0x3bf7f1;
-                break;
-
-            case next_in_queue:
-                result[row][col].tint = 0xf7b63b;
                 break;
 
             default:
@@ -133,8 +123,12 @@ function init_teture_array(
             result[row][col].width = cell_width;
             result[row][col].height = cell_height;
 
-            result[row][col].position.set(col * cell_width, row * cell_height);
-            app.stage.addChild(result[row][col]);
+            result[row][col].position.set(
+                (col * cell_width),
+                (row * cell_height)
+            );
+
+            container.addChild(result[row][col]);
         });
     });
     return result;
@@ -146,53 +140,129 @@ function init_teture_array(
 // create sprite from url
 // const bunny = pixi.Sprite.from("https://pixijs.com/assets/bunny.png");
 
-const textures = init_teture_array(maze);
-console.log(textures);
+const graph = maze_to_listgraph(maze);
+let algorithms: Array<{
+    textures: Array<Array<pixi.Sprite>>;
+    algorithm: Stream<Result>;
+}> = [];
 
-let seconds = 0;
 
-// Listen for animate update
-let row = 3;
-let col = 3;
-app.ticker.add(() => {
-    seconds += app.ticker.deltaMS;
-    if (seconds >= 500) {
-        const old_tint = textures[row][col].tint;
-        textures[row][col].tint = 0xf00f0;
-        seconds = 0;
-        console.log("Randoming");
-        let new_row = 0;
-        let new_col = 0;
-        while (maze[new_row][new_col] === maze_wall) {
-            new_col = col;
-            new_row = row;
-            if (Math.random() > 0.5) {
-                new_row = Math.max(
-                    Math.min(
-                        row + (Math.round(Math.random()) === 0 ? -1 : 1),
-                        maze.length - 1
-                    ),
-                    0
-                );
-            } else {
-                new_col = Math.max(
-                    Math.min(
-                        col + (Math.round(Math.random()) === 0 ? -1 : 1),
-                        maze[row].length - 1
-                    ),
-                    0
-                );
+// Create a container holding breadth first
+let container = new pixi.Container();
+
+// Create the record holding textures and the algorithm
+let breadth_algorithm = {
+    textures: init_texture_array(
+        maze,
+        container,
+        app.renderer.width / 2,
+        app.renderer.height / 2
+    ),
+    algorithm: lg_breadth_first(graph, 1, 43)
+};
+
+// add to array of algorithms
+algorithms.push(breadth_algorithm);
+
+// add element to main stage
+app.stage.addChild(container);
+
+
+// Create a container holding depth first
+container = new pixi.Container();
+
+// Move container to right half
+container.x = app.screen.width / 2;
+
+// Create the record holding textures and the algorithm
+let depth_algorithm = {
+    textures: init_texture_array(
+        maze,
+        container,
+        app.renderer.width / 2,
+        app.renderer.height / 2
+    ),
+    algorithm: lg_depth_first(graph, 1, 13)
+};
+
+// add to array of algorithms
+algorithms.push(depth_algorithm);
+
+// add element to main stage
+app.stage.addChild(container);
+let mili_seconds = 0;
+
+function draw(
+    algorithms: Array<{
+        textures: Array<Array<pixi.Sprite>>;
+        algorithm: Stream<Result>;
+    }>
+): void {
+    console.log("Drawing...");
+    algorithms.forEach((algorithm) => {
+        // Draw all visited nodes
+        let visited = head(algorithm.algorithm).visited_nodes;
+        visited.forEach((node, index) => {
+            if (node === 1) {
+                let pos = deepen_index(index, maze);
+                if (pos !== undefined) {
+                    // grå
+                    algorithm.textures[pos.row][pos.col].tint = 0xb0acb0;
+                }
             }
+        });
+
+        // Draw all nodes pending a visit from algorithm
+        let in_queue = head(algorithm.algorithm).in_queue;
+        while (!is_empty(in_queue)) {
+            let pos = deepen_index(head_of_queue(in_queue), maze);
+            if (pos !== undefined) {
+                // ljusare cyan
+                algorithm.textures[pos.row][pos.col].tint = 0x34ebb7;
+            }
+            in_queue = dequeue(in_queue);
         }
 
-        row = new_row;
-        col = new_col;
-        textures[row][col].tint = old_tint;
-        console.log("row: %d,  col: ", row, col);
-        if (maze[row][col] === not_visited) {
-            maze[row][col] = visited;
-            textures[row][col].tint = 0xff0000;
+        // Draw the path taken to reach the current node
+        let current_path = head(algorithm.algorithm).path_so_far;
+        while (!is_empty(current_path)) {
+            let pos = deepen_index(head_of_queue(current_path), maze);
+            if (pos !== undefined) {
+                if (head(algorithm.algorithm).is_done) {
+                    // grön
+                    algorithm.textures[pos.row][pos.col].tint = 0x00ff2f;
+                } else {
+                    // gul
+                    algorithm.textures[pos.row][pos.col].tint = 0xe8c100;
+                }
+            }
+            current_path = dequeue(current_path);
         }
+
+        // Draw the current node
+        let current_node = deepen_index(
+            head(algorithm.algorithm).current_node,
+            maze
+        );
+        if (current_node !== undefined) {
+            // lila
+            algorithm.textures
+                [current_node.row][current_node.col].tint = 0xd534eb;
+        }
+
+        // Take the next step of the algorithm
+        const stream_tail = tail(algorithm.algorithm);
+        if (!is_null(stream_tail)) {
+            algorithm.algorithm = stream_tail();
+        }
+    });
+}
+
+app.ticker.add(() => {
+    mili_seconds += app.ticker.deltaMS;
+    if (mili_seconds >= 1000) {
+        mili_seconds = 0;
+        draw(algorithms);
     }
 
     // just for fun, let's rotate mr rabbit a little
