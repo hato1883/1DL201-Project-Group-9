@@ -15,7 +15,7 @@ document.body.appendChild(app.view);
 const maze_wall: Wall = false;
 const not_visited: Free = true;
 
-const maze: Maze = iterative_maze_generation(100);
+const maze: Maze = iterative_maze_generation(50);
 
 // sometinh ~2 days
 // other [optional] ~3 days
@@ -78,6 +78,7 @@ let algorithms: Array<{
 let container = new pixi.Container();
 
 let start = flatten_index(1, 1, maze);
+let end = flatten_index(maze.width - 2, maze.height - 2, maze);
 
 // Create the record holding textures and the algorithm
 let breadth_algorithm = {
@@ -87,7 +88,11 @@ let breadth_algorithm = {
         app.renderer.height / 2,
         app.renderer.height / 2
     ),
-    algorithm: lg_breadth_first(graph, start === undefined ? 0 : start, 43)
+    algorithm: lg_breadth_first(
+        graph,
+        start === undefined ? 0 : start,
+        end === undefined ? 0 : end
+    )
 };
 
 // add to array of algorithms
@@ -111,7 +116,11 @@ let depth_algorithm = {
         app.renderer.height / 2,
         app.renderer.height / 2
     ),
-    algorithm: lg_depth_first(graph, start === undefined ? 0 : start, 13)
+    algorithm: lg_depth_first(
+        graph,
+        start === undefined ? 0 : start,
+        end === undefined ? 0 : end
+    )
 };
 
 // add to array of algorithms
@@ -188,7 +197,7 @@ function draw(
 
 app.ticker.add(() => {
     mili_seconds += app.ticker.deltaMS;
-    if (mili_seconds >= 1) {
+    if (mili_seconds >= 100) {
         mili_seconds = 0;
         draw(algorithms);
     }
