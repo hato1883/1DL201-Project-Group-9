@@ -1,9 +1,13 @@
 import * as pixi from "pixi.js";
-import { Free, Maze, Wall, deepen_index, maze_to_listgraph } from "./maze";
+import {
+    Free, Maze, Wall, deepen_index,
+    flatten_index, maze_to_listgraph
+} from "./maze";
 import { lg_breadth_first, lg_depth_first } from "./graphs";
 import { head, is_null, tail } from "./list";
 import { is_empty, head as head_of_queue, dequeue } from "./queue_immutable";
 import { Result, Stream } from "./path";
+import { iterative_maze_generation } from "./maze_generator";
 
 const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
@@ -11,84 +15,7 @@ document.body.appendChild(app.view);
 const maze_wall: Wall = false;
 const not_visited: Free = true;
 
-const maze: Maze = {
-    width: 7,
-    height: 8,
-    matrix: [
-        [
-            maze_wall,
-            not_visited,
-            maze_wall,
-            maze_wall,
-            maze_wall,
-            maze_wall,
-            maze_wall
-        ],
-        [
-            maze_wall,
-            not_visited,
-            not_visited,
-            not_visited,
-            not_visited,
-            maze_wall,
-            not_visited
-        ],
-        [
-            maze_wall,
-            maze_wall,
-            maze_wall,
-            maze_wall,
-            not_visited,
-            not_visited,
-            not_visited
-        ],
-        [
-            maze_wall,
-            not_visited,
-            not_visited,
-            not_visited,
-            not_visited,
-            maze_wall,
-            maze_wall
-        ],
-        [
-            maze_wall,
-            not_visited,
-            maze_wall,
-            maze_wall,
-            not_visited,
-            maze_wall,
-            maze_wall
-        ],
-        [
-            maze_wall,
-            maze_wall,
-            not_visited,
-            not_visited,
-            not_visited,
-            maze_wall,
-            maze_wall
-        ],
-        [
-            maze_wall,
-            not_visited,
-            not_visited,
-            maze_wall,
-            not_visited,
-            not_visited,
-            maze_wall
-        ],
-        [
-            maze_wall,
-            maze_wall,
-            maze_wall,
-            maze_wall,
-            maze_wall,
-            maze_wall,
-            maze_wall
-        ]
-    ]
-};
+const maze: Maze = iterative_maze_generation(50);
 
 // sometinh ~2 days
 // other [optional] ~3 days
@@ -150,15 +77,22 @@ let algorithms: Array<{
 // Create a container holding breadth first
 let container = new pixi.Container();
 
+let start = flatten_index(1, 1, maze);
+let end = flatten_index(maze.width - 2, maze.height - 2, maze);
+
 // Create the record holding textures and the algorithm
 let breadth_algorithm = {
     textures: init_texture_array(
         maze,
         container,
-        app.renderer.width / 2,
+        app.renderer.height / 2,
         app.renderer.height / 2
     ),
-    algorithm: lg_breadth_first(graph, 1, 43)
+    algorithm: lg_breadth_first(
+        graph,
+        start === undefined ? 0 : start,
+        end === undefined ? 0 : end
+    )
 };
 
 // add to array of algorithms
@@ -179,10 +113,14 @@ let depth_algorithm = {
     textures: init_texture_array(
         maze,
         container,
-        app.renderer.width / 2,
+        app.renderer.height / 2,
         app.renderer.height / 2
     ),
-    algorithm: lg_depth_first(graph, 1, 13)
+    algorithm: lg_depth_first(
+        graph,
+        start === undefined ? 0 : start,
+        end === undefined ? 0 : end
+    )
 };
 
 // add to array of algorithms
@@ -198,7 +136,6 @@ function draw(
         algorithm: Stream<Result>;
     }>
 ): void {
-    console.log("Drawing...");
     algorithms.forEach((algorithm) => {
         // Draw all visited nodes
         let visited = head(algorithm.algorithm).visited_nodes;
@@ -260,7 +197,7 @@ function draw(
 
 app.ticker.add(() => {
     mili_seconds += app.ticker.deltaMS;
-    if (mili_seconds >= 1000) {
+    if (mili_seconds >= 100) {
         mili_seconds = 0;
         draw(algorithms);
     }

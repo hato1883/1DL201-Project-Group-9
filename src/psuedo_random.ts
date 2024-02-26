@@ -1,0 +1,36 @@
+/**
+ * Takes in a seed
+ * returns and returns a object containing diffrent function calls.
+ * 
+ */
+export function splitmix32(a: number): {
+    random: () => number;
+    random_int: (min?: number, max?: number) => number;
+    random_float: (min?: number, max?: number) => number;
+    random_bool: () => boolean;
+} {
+    function random(): number {
+        a |= 0;
+        a = (a + 0x9e3779b9) | 0;
+        var t = a ^ (a >>> 16);
+        t = Math.imul(t, 0x21f0aaad);
+        t = t ^ (t >>> 15);
+        t = Math.imul(t, 0x735a2d97);
+        return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
+    }
+    function random_int(min = 0, max = 1): number {
+        return Math.round((random() * (max - min)) + min);
+    }
+    function random_float(min = 0, max = 1): number {
+        return (random() * (max - min)) + min;
+    }
+    function random_bool(): boolean {
+        return Math.round(random()) ? true : false;
+    }
+    return {
+        random: random,
+        random_int: random_int,
+        random_float: random_float,
+        random_bool: random_bool
+    };
+}
