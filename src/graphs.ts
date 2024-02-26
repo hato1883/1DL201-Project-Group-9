@@ -12,8 +12,19 @@ import {
     Queue, dequeue, enqueue,
     empty as empty_queue,
     is_empty as is_queue_empty,
-    head as queue_head
+    head as queue_head,
+    queue
 } from "./queue_immutable";
+import {
+    PrioQueue,
+    dequeue as prio_dequeue,
+    enqueue as prio_enqueue,
+    is_empty as is_prio_empty,
+    empty as empty_prio_queue,
+    head as prio_queue_head,
+    update_prio
+} from "./prio_queue";
+import { Maze, deepen_index } from "./maze";
 
 
 /**
@@ -211,6 +222,10 @@ export function lg_depth_first(
     // initialized / visited / explored state of each node.
     const exploration_state = Array<number>(graph.size).fill(initialized);
 
+    // create a data type to store:
+    // Completed visists
+    const visited_nodes = Array<Node>(graph.size);
+
     // create a data type to store the path to the given node
     // (Path from `start` node)
     // All nodes start with a null path meaning there is no path
@@ -228,6 +243,7 @@ export function lg_depth_first(
         Queue<Node>
     ): Queue<Node> {
         exploration_state[node] = visited;
+        visited_nodes.push(node);
         next_node = push(node, next_node);
         return enqueue(node, path_so_far);
     }
@@ -244,7 +260,7 @@ export function lg_depth_first(
             if (node === end) {
                 return {
                     in_queue: next_node,
-                    visited_nodes: exploration_state,
+                    visited_nodes: visited_nodes,
                     current_node: node,
                     path_so_far: path_to_node[node],
                     is_done: true
@@ -273,7 +289,7 @@ export function lg_depth_first(
 
             return {
                 in_queue: next_node,
-                visited_nodes: exploration_state,
+                visited_nodes: visited_nodes,
                 current_node: node,
                 path_so_far: path_to_node[node],
                 is_done: false
@@ -281,7 +297,7 @@ export function lg_depth_first(
         } else {
             return {
                 in_queue: next_node,
-                visited_nodes: exploration_state,
+                visited_nodes: visited_nodes,
                 current_node: -1,
                 path_so_far: path_to_node[end],
                 is_done: true
@@ -302,7 +318,7 @@ export function lg_depth_first(
     );
 
     // runs a single step of the algorithm and returns the state.
-    // paired with a refrence toi this function to get the next state.
+    // paired with a refrence to this function to get the next state.
     // lazy evaluation
     function data_stream(): Stream<Result> {
         const result = lg_depth_first_step();
@@ -365,6 +381,10 @@ export function lg_breadth_first(
     // initialized / visited / explored state of each node.
     const exploration_state = Array<number>(graph.size).fill(initialized);
 
+    // create a data type to store:
+    // Completed visists
+    const visited_nodes = Array<Node>(graph.size);
+
     // create a data type to store the path to the given node
     // (Path from `start` node)
     // All nodes start with a null path meaning there is no path
@@ -381,6 +401,7 @@ export function lg_breadth_first(
         path_so_far: Queue<Node>
     ): Queue<Node> {
         exploration_state[node] = visited;
+        visited_nodes.push(node);
         next_node = enqueue(node, next_node);
         return enqueue(node, path_so_far);
     }
@@ -397,7 +418,7 @@ export function lg_breadth_first(
             if (node === end) {
                 return {
                     in_queue: next_node,
-                    visited_nodes: exploration_state,
+                    visited_nodes: visited_nodes,
                     current_node: node,
                     path_so_far: path_to_node[node],
                     is_done: true
@@ -426,7 +447,7 @@ export function lg_breadth_first(
 
             return {
                 in_queue: next_node,
-                visited_nodes: exploration_state,
+                visited_nodes: visited_nodes,
                 current_node: node,
                 path_so_far: path_to_node[node],
                 is_done: false
@@ -434,7 +455,7 @@ export function lg_breadth_first(
         } else {
             return {
                 in_queue: next_node,
-                visited_nodes: exploration_state,
+                visited_nodes: visited_nodes,
                 current_node: -1,
                 path_so_far: path_to_node[end],
                 is_done: true
@@ -456,6 +477,288 @@ export function lg_breadth_first(
 
     function data_stream(): Stream<Result> {
         const result = lg_breadth_first_step();
+        return pair(
+            result,
+            result.is_done ? null : data_stream
+        );
+    }
+
+    return stream;
+}
+
+
+export function lg_dijkstra_path(
+    graph: ListGraph,
+    start: Node,
+    end: Node
+): Stream<Result> {
+    // Priority Queue showing what node is next to check.
+    let left_to_check: PrioQueue<Node> = empty_prio_queue();
+
+    // stores distance to each node
+    const dist = Array<number>(graph.size).fill(-Infinity);
+
+    // stores Completed visists
+    const completed = Array<Node>(graph.size);
+
+    // Distance to start is known to be 0
+    dist[start] = 0;
+
+    // Queue all nodes with distance as priority.
+    for (let node = 0; node < graph.size; node++) {
+        prio_enqueue(dist[node], node, left_to_check);
+    }
+
+    // create a data type to store:
+    // stores previous node to the given node
+    const prev = Array<Node>(graph.size);
+
+    // Handels the logic between a node and its neighbour
+    function lg_dijkstra_visit(
+        parent: Node,
+        neighbour: Node
+    ): void {
+        // Our graph is unweigthed
+        // which we can just assume means all weights are equal to 1
+        // due to queue favoring larger priorities we must use negative values
+        let calculated_dist = dist[parent] - 1;
+        if (calculated_dist
+            > dist[neighbour]
+        ) {
+            dist[neighbour] = calculated_dist;
+            prev[neighbour] = parent;
+            update_prio(calculated_dist, neighbour, left_to_check);
+        }
+    }
+
+    // Stepwise progression of dijkstra's algorithm,
+    function lg_dijkstra_step(): Result {
+        if (!is_prio_empty(left_to_check)) {
+            const node = prio_queue_head(left_to_check);
+            completed.push(node);
+            if (node === end) {
+                return {
+                    in_queue: queue(prio_queue_head(left_to_check)),
+                    visited_nodes: completed,
+                    current_node: node,
+                    path_so_far: lg_dijkstra_create_path(node),
+                    is_done: true
+                };
+            }
+            prio_dequeue(left_to_check);
+
+            for_each(
+                (neighbour) => lg_dijkstra_visit(node, neighbour),
+                graph.adj[node]
+            );
+
+            return {
+                in_queue: queue(prio_queue_head(left_to_check)),
+                visited_nodes: completed,
+                current_node: node,
+                path_so_far: lg_dijkstra_create_path(node),
+                is_done: false
+            };
+        } else {
+            // No path found
+            return {
+                in_queue: empty_queue(),
+                visited_nodes: completed,
+                current_node: -1,
+                path_so_far: null,
+                is_done: true
+            };
+        }
+    }
+
+    function lg_dijkstra_create_path(dest: Node): Path {
+        const reversed_path = [];
+        let current_node = dest;
+        if (prev[current_node] !== undefined) {
+            while (current_node !== undefined) {
+                reversed_path.push(current_node);
+                current_node = prev[current_node];
+            }
+
+            // create path by enqueuing elements from right to left
+            return queue<Node>(...reversed_path.reverse());
+        } else {
+            return null;
+        } // no path
+    }
+
+    // Initialize stream with only starting node in the stack
+    const stream: Stream<Result> = pair(
+        {
+            in_queue: queue(prio_queue_head(left_to_check)),
+            visited_nodes: Array<Node>(),
+            current_node: -1,
+            path_so_far: null,
+            is_done: false
+        },
+        () => data_stream()
+    );
+
+    // runs a single step of the algorithm and returns the state.
+    // paired with a refrence to this function to get the next state.
+    // lazy evaluation
+    function data_stream(): Stream<Result> {
+        const result = lg_dijkstra_step();
+        return pair(
+            result,
+            result.is_done ? null : data_stream
+        );
+    }
+
+    return stream;
+}
+
+
+export function lg_a_star_path(
+    graph: ListGraph,
+    maze_ref: Maze,
+    start: Node,
+    end: Node
+): Stream<Result> {
+    function a_star_heuristic_geuss(
+        node: Node,
+        endpoint: Node
+    ): number {
+        const start_pos = deepen_index(
+            node,
+            maze_ref
+        ) as { row: number; col: number };
+        const end_pos = deepen_index(
+            endpoint,
+            maze_ref
+        ) as { row: number; col: number };
+        let dist = Math.abs(start_pos.row - end_pos.row)
+            + Math.abs(start_pos.col - end_pos.col);
+
+        // Get Manhattan distance
+        return -dist;
+    }
+
+    // Priority Queue showing what node is next to check.
+    let left_to_check: PrioQueue<Node> = empty_prio_queue();
+
+    // ´stores distance to each node
+    const dist_travled = Array<number>(graph.size).fill(-Infinity);
+
+    // Distance to start is known to be 0
+    dist_travled[start] = 0;
+
+    // stores distance to each node
+    const est_dist_left = Array<number>(graph.size).fill(-Infinity);
+
+    // Distance to start is known to be 0
+    est_dist_left[start] = a_star_heuristic_geuss(start, end);
+
+    // stores Completed visists to Nodes
+    const completed = Array<Node>(graph.size);
+
+    // Queue all nodes with distance as priority.
+    for (let node = 0; node < graph.size; node++) {
+        prio_enqueue(est_dist_left[node], node, left_to_check);
+    }
+
+    // stores previous node to the given node
+    const prev = Array<Node>(graph.size);
+
+    // Handels the logic for the given node and its neighbour
+    function lg_a_star_visit(
+        parent: Node,
+        neighbour: Node
+    ): void {
+        // Our graph is unweigthed
+        // which we can just assume means all weights are equal to 1
+        // due to queue favoring larger priorities we must use negative values
+        let calculated_dist = dist_travled[parent] - 1;
+        if (calculated_dist
+            > dist_travled[neighbour]
+        ) {
+            dist_travled[neighbour] = calculated_dist;
+            est_dist_left[neighbour] = calculated_dist
+            + a_star_heuristic_geuss(neighbour, end);
+
+            prev[neighbour] = parent;
+            update_prio(est_dist_left[neighbour], neighbour, left_to_check);
+        }
+    }
+
+    // Stepwise progression of A* algorithm,
+    function lg_a_star_step(): Result {
+        if (!is_prio_empty(left_to_check)) {
+            const node = prio_queue_head(left_to_check);
+            completed.push(node);
+            if (node === end) {
+                return {
+                    in_queue: queue(prio_queue_head(left_to_check)),
+                    visited_nodes: completed,
+                    current_node: node,
+                    path_so_far: lg_a_star_create_path(node),
+                    is_done: true
+                };
+            }
+            prio_dequeue(left_to_check);
+
+            for_each(
+                (neighbour) => lg_a_star_visit(node, neighbour),
+                graph.adj[node]
+            );
+
+            return {
+                in_queue: queue(prio_queue_head(left_to_check)),
+                visited_nodes: completed,
+                current_node: node,
+                path_so_far: lg_a_star_create_path(node),
+                is_done: false
+            };
+        } else {
+            // No path found
+            return {
+                in_queue: empty_queue(),
+                visited_nodes: completed,
+                current_node: -1,
+                path_so_far: null,
+                is_done: true
+            };
+        }
+    }
+
+    function lg_a_star_create_path(dest: Node): Path {
+        const reversed_path = [];
+        let current_node = dest;
+        if (prev[current_node] !== undefined) {
+            while (current_node !== undefined) {
+                reversed_path.push(current_node);
+                current_node = prev[current_node];
+            }
+
+            // create path by enqueuing elements from right to left
+            return queue<Node>(...reversed_path.reverse());
+        } else {
+            return null;
+        } // no path
+    }
+
+    // Initialize stream with only starting node in the stack
+    const stream: Stream<Result> = pair(
+        {
+            in_queue: queue(prio_queue_head(left_to_check)),
+            visited_nodes: Array<Node>(),
+            current_node: -1,
+            path_so_far: null,
+            is_done: false
+        },
+        () => data_stream()
+    );
+
+    // runs a single step of the algorithm and returns the state.
+    // paired with a refrence to this function to get the next state.
+    // lazy evaluation
+    function data_stream(): Stream<Result> {
+        const result = lg_a_star_step();
         return pair(
             result,
             result.is_done ? null : data_stream

@@ -1,9 +1,12 @@
 import * as pixi from "pixi.js";
 import {
-    Free, Maze, Wall, deepen_index,
-    flatten_index, maze_to_listgraph
+    Maze, deepen_index,
+    flatten_index, free, wall, maze_to_listgraph
 } from "./maze";
-import { lg_breadth_first, lg_depth_first } from "./graphs";
+import {
+    lg_a_star_path, lg_breadth_first,
+    lg_depth_first, lg_dijkstra_path
+} from "./graphs";
 import { head, is_null, tail } from "./list";
 import { is_empty, head as head_of_queue, dequeue } from "./queue_immutable";
 import { Result, Stream } from "./path";
@@ -11,9 +14,6 @@ import { iterative_maze_generation } from "./maze_generator";
 
 const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
-
-const maze_wall: Wall = false;
-const not_visited: Free = true;
 
 const maze: Maze = iterative_maze_generation(50);
 
@@ -35,11 +35,11 @@ function init_texture_array(
         maze_row.forEach((cell, col) => {
             result[row][col] = new pixi.Sprite(pixi.Texture.WHITE);
             switch (cell) {
-            case maze_wall:
+            case wall:
                 result[row][col].tint = 0x000000;
                 break;
 
-            case not_visited:
+            case free:
                 result[row][col].tint = 0xffffff;
                 break;
 
@@ -85,8 +85,8 @@ let breadth_algorithm = {
     textures: init_texture_array(
         maze,
         container,
-        app.renderer.height / 2,
-        app.renderer.height / 2
+        (app.renderer.height - 20) / 2,
+        (app.renderer.height - 20) / 2
     ),
     algorithm: lg_breadth_first(
         graph,
@@ -106,15 +106,16 @@ app.stage.addChild(container);
 container = new pixi.Container();
 
 // Move container to right half
-container.x = app.screen.width / 2;
+container.x = (app.screen.width * 1) / 4;
+container.y = (app.screen.height * 1) / 2;
 
 // Create the record holding textures and the algorithm
 let depth_algorithm = {
     textures: init_texture_array(
         maze,
         container,
-        app.renderer.height / 2,
-        app.renderer.height / 2
+        (app.renderer.height - 20) / 2,
+        (app.renderer.height - 20) / 2
     ),
     algorithm: lg_depth_first(
         graph,
@@ -128,6 +129,65 @@ algorithms.push(depth_algorithm);
 
 // add element to main stage
 app.stage.addChild(container);
+
+
+// Create a container holding depth first
+container = new pixi.Container();
+
+// Move container to right half
+container.x = (app.screen.width * 2) / 4;
+
+// Create the record holding textures and the algorithm
+let dijkstra_algorithm = {
+    textures: init_texture_array(
+        maze,
+        container,
+        (app.renderer.height - 20) / 2,
+        (app.renderer.height - 20) / 2
+    ),
+    algorithm: lg_dijkstra_path(
+        graph,
+        start === undefined ? 0 : start,
+        end === undefined ? 0 : end
+    )
+};
+
+// add to array of algorithms
+algorithms.push(dijkstra_algorithm);
+
+// add element to main stage
+app.stage.addChild(container);
+
+
+// Create a container holding depth first
+container = new pixi.Container();
+
+// Move container to right half
+container.x = (app.screen.width * 3) / 4;
+container.y = (app.screen.height * 1) / 2;
+
+// Create the record holding textures and the algorithm
+let a_star_algorithm = {
+    textures: init_texture_array(
+        maze,
+        container,
+        (app.renderer.height - 20) / 2,
+        (app.renderer.height - 20) / 2
+    ),
+    algorithm: lg_a_star_path(
+        graph,
+        maze,
+        start === undefined ? 0 : start,
+        end === undefined ? 0 : end
+    )
+};
+
+// add to array of algorithms
+algorithms.push(a_star_algorithm);
+
+// add element to main stage
+app.stage.addChild(container);
+
 let mili_seconds = 0;
 
 function draw(
@@ -139,13 +199,11 @@ function draw(
     algorithms.forEach((algorithm) => {
         // Draw all visited nodes
         let visited = head(algorithm.algorithm).visited_nodes;
-        visited.forEach((node, index) => {
-            if (node === 1) {
-                let pos = deepen_index(index, maze);
-                if (pos !== undefined) {
-                    // grå
-                    algorithm.textures[pos.row][pos.col].tint = 0xb0acb0;
-                }
+        visited.forEach((node) => {
+            let pos = deepen_index(node, maze);
+            if (pos !== undefined) {
+                // grå
+                algorithm.textures[pos.row][pos.col].tint = 0xb0acb0;
             }
         });
 
@@ -197,7 +255,7 @@ function draw(
 
 app.ticker.add(() => {
     mili_seconds += app.ticker.deltaMS;
-    if (mili_seconds >= 100) {
+    if (mili_seconds >= 10) {
         mili_seconds = 0;
         draw(algorithms);
     }
