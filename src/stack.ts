@@ -99,3 +99,34 @@ export function display_stack<T>(stck: Stack<T>): void {
         console.log("stack(" + print(stck) + ")");
     }
 }
+
+/**
+ * Creates a array with items in the same order of the Stack.
+ * First item in Stack is put at index 0, n:th item in Stack is put at index n-1
+ * 
+ * @example
+ * ```ts
+ * const init_q = stack(1, 2, 3, 4);
+ * stack_to_array(init_q);
+ * // returns array [4, 3, 2, 1]
+ * 
+ * init_q = pop(init_q);
+ * stack_to_array(init_q);
+ * // returns array [3, 2, 1]
+ * 
+ * init_q = push(5, init_q);
+ * stack_to_array(init_q);
+ * // returns array [5, 3, 2, 1]
+ * ```
+ * 
+ * @template T type of all stack elements
+ * @param stck stack to create a array from
+ */
+export function stack_to_array<T>(stck: Stack<T>): Array<T> {
+    const result_array = Array<T>();
+    while (!is_empty(stck)) {
+        result_array.push(top(stck));
+        stck = pop(stck);
+    }
+    return result_array;
+}

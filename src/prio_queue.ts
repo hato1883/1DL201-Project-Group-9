@@ -10,6 +10,22 @@
  */
 export type PrioQueue<T> = [number, number, Array<[number, T]>];
 
+
+// Location of the head index in the Priority queue object
+const queue_head = 0;
+
+// Location of the tail index in the Priority queue object
+const next_empty = 1;
+
+// Location of the queue in the Priority queue object
+const q_arr = 2;
+
+// Location of the priority in the queue element.
+const prio_pos = 0;
+
+// Location of the value in the queue element.
+const value_pos = 1;
+
 /**
  * Constructs a priority queue without any elements.
  * @template T type of all queue elements
@@ -20,13 +36,52 @@ export function empty<T>(): PrioQueue<T> {
 }
 
 /**
+ * Constructs a PrioQueue with all given elements in order,
+ * First element in the arguments is the first to be enqueued.
+ *  (larger means higher priority)
+ * 
+ * @example
+ * ```ts
+ * queue([0, 1], [1, 2], [2, 3]);
+ * // results in the order 3, 2, 1
+ * // where 3 is first and 1 is last.
+ * 
+ * queue([3, 1], [2, 2], [1, 3]);
+ * // results in the order 1, 2, 3
+ * // where 1 is first and 3 is last.
+ * ```
+ * 
+ * @template T type of all queue elements
+ * @param args a Array containing pairs/tuples of
+ * `[priority: number, element: T]` to be enqueue into the priority queue.
+ * @returns Returns an empty queue.
+ */
+export function queue<T>(...args: Array<[number, T]>): PrioQueue<T> {
+    // Location of the priority in the queue element.
+    const prio = 0;
+
+    // Location of the value in the queue element.
+    const value = 1;
+
+    const result_queue = empty<T>();
+    args.reduce(
+        (built_stack: PrioQueue<T>, item: [number, T]) => {
+            enqueue(item[prio], item[value], built_stack);
+            return result_queue;
+        },
+        result_queue
+    );
+    return result_queue;
+}
+
+/**
  * Checks whether a priority queue is empty.
  * @template T type of all queue elements
  * @param q queue to check for emptiness
  * @returns Returns true, if q has elements, false otherwise.
  */
 export function is_empty<T>(q: PrioQueue<T>): boolean {
-    return q[0] === q[1];
+    return q[queue_head] === q[next_empty];
 }
 
 /**
@@ -38,17 +93,17 @@ export function is_empty<T>(q: PrioQueue<T>): boolean {
  * @modifies q such that e is added with priority prio
  */
 export function enqueue<T>(prio: number, e: T, q: PrioQueue<T>): void {
-    const tail_index = q[1];
-    q[2][tail_index] = [prio, e];
+    const tail_index = q[next_empty];
+    q[q_arr][tail_index] = [prio, e];
     if (!is_empty(q)) {
         // we have at least one element
-        const head_index = q[0];
-        const elems = q[2];
+        const head_index = q[queue_head];
+        const elems = q[q_arr];
         elems[tail_index] = [prio, e];
 
         // swap elements until we find the right spot
         for (let i = tail_index; i > head_index; i = i - 1) {
-            if (elems[i - 1][0] >= elems[i][0]) {
+            if (elems[i - 1][prio_pos] >= elems[i][prio_pos]) {
                 break;
             } else {
                 // swap
@@ -56,7 +111,7 @@ export function enqueue<T>(prio: number, e: T, q: PrioQueue<T>): void {
             }
         }
     } else {}
-    q[1] = tail_index + 1;  // update tail index
+    q[next_empty] = tail_index + 1;  // update tail index
 }
 
 /**
@@ -69,15 +124,18 @@ export function enqueue<T>(prio: number, e: T, q: PrioQueue<T>): void {
  */
 export function update_prio<T>(prio: number, e: T, q: PrioQueue<T>): void {
     // Find index of element
-    const index_of_e = q[2].findIndex((value: [number, T]) => e === value[1]);
+    const index_of_e = q[q_arr].findIndex(
+        (value: [number, T]) => e === value[value_pos]
+    );
+
     if (index_of_e >= 0) { // index of e was found
-        const elems = q[2];
-        const head_index = q[0];
-        elems[index_of_e][0] = prio;
+        const elems = q[q_arr];
+        const head_index = q[queue_head];
+        elems[index_of_e][prio_pos] = prio;
 
         // swap elements until we find the right spot
         for (let i = index_of_e; i > head_index; i = i - 1) {
-            if (elems[i - 1][0] >= elems[i][0]) {
+            if (elems[i - 1][prio_pos] >= elems[i][prio_pos]) {
                 break;
             } else {
                 // swap
@@ -103,8 +161,8 @@ function swap<T>(a: Array<T>, i: number, j: number): void {
  * @returns Returns the element of the queue that has the highest priority.
  */
 export function head<T>(q: PrioQueue<T>): T {
-    const head_index = q[0];
-    return q[2][head_index][1];
+    const head_index = q[queue_head];
+    return q[q_arr][head_index][value_pos];
 }
 
 /**
@@ -117,8 +175,8 @@ export function head<T>(q: PrioQueue<T>): T {
  * @modifies q such that the element with the highest priority is removed
  */
 export function dequeue<T>(q: PrioQueue<T>): void {
-    const head_index = q[0];
-    q[0] = head_index + 1;
+    const head_index = q[queue_head];
+    q[queue_head] = head_index + 1;
 }
 
 /**
@@ -126,6 +184,47 @@ export function dequeue<T>(q: PrioQueue<T>): void {
  * @template T type of all queue elements
  * @param q queue to pretty-print
  */
+
 export function display_queue<T>(q: PrioQueue<T>): void {
-    console.log(q[2].slice(q[0], q[1]));
+    let msg = "queue(";
+    for (let index = q[queue_head]; index < q[next_empty]; index++) {
+        msg = msg + q[q_arr][index];
+        if (index + 1 < q[next_empty]) {
+            msg = msg + ", ";
+        }
+    }
+    msg = msg + ")";
+    console.log(msg);
+}
+
+/**
+ * Creates a array with items in the same order of the queue.
+ * First item in queue is put at index 0, n:th item in queue is put at index n-1
+ * 
+ * @example
+ * ```ts
+ * const init_q = queue(1, 2, 3, 4);
+ * queue_to_array(init_q);
+ * // returns array [1, 2, 3, 4]
+ * 
+ * dequeue(init_q);
+ * queue_to_array(init_q);
+ * // returns array [2, 3, 4]
+ * 
+ * enqueue(5, init_q);
+ * queue_to_array(init_q);
+ * // returns array [2, 3, 4, 5]
+ * ```
+ * 
+ * @template T type of all queue elements
+ * @param q queue to create a array from
+ */
+export function queue_to_array<T>(q: PrioQueue<T>): Array<T> {
+    const result_array = Array<T>(q[queue_head] - q[next_empty]);
+    for (let q_index = q[queue_head];
+        q_index < q[next_empty];
+        q_index++) {
+        result_array.push(q[q_arr][q_index][value_pos]);
+    }
+    return result_array;
 }
