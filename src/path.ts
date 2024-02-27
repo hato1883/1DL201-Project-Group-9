@@ -1,8 +1,7 @@
-import { Queue } from "./queue_immutable";
 import { Node } from "./graphs";
 import { Pair } from "./list";
 
-export type Path = Queue<Node> | null;
+export type Path = Array<Node>;
 
 // 1: vad som är i kön just nu,
 // 2: besökt noder,
@@ -11,7 +10,7 @@ export type Path = Queue<Node> | null;
 // 5: är klar?
 // { in_queue: 1, 2, 3, 4, visited: start }
 export type Result = {
-    readonly in_queue: Queue<Node>;
+    readonly in_queue: Array<Node>;
     readonly visited_nodes: Array<Node>;
     readonly current_node: Node;
     readonly path_so_far: Path;

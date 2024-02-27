@@ -507,7 +507,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, null]] as Queue<number>
+        [a, b]
     );
 
     result = eval_stream(
@@ -528,7 +528,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [c, null]]] as Queue<number>
+        [a, b, c]
     );
 
 
@@ -550,7 +550,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [b, [c, null]] as Queue<number>
+        [b, c]
     );
 
 
@@ -573,7 +573,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        null
+        []
     );
 
 
@@ -596,7 +596,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [c, [b, null]] as Queue<number>
+        [c, b]
     );
 
 
@@ -621,7 +621,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [c, [e, null]]]] as Queue<number>
+        [a, b, c, e]
     );
 
 
@@ -647,7 +647,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [c, [f, null]]]] as Queue<number>
+        [a, b, c, f]
     );
 
 
@@ -673,7 +673,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [d, [f, null]]]] as Queue<number>
+        [a, b, d, f]
     );
 
 
@@ -684,7 +684,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [d, [g, null]]] as Queue<number>
+        [a, d, g]
     );
 
 
@@ -695,7 +695,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [f, [h, null]]]] as Queue<number>
+        [a, b, f, h]
     );
 
 
@@ -706,7 +706,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [c, null]]] as Queue<number>
+        [a, b, c]
     );
 
 
@@ -717,7 +717,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [d, [e, null]]] as Queue<number>
+        [a, d, e]
     );
 });
 
@@ -740,7 +740,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, null]] as Queue<number>
+        [a, b]
     );
 
 
@@ -762,7 +762,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [c, null]]] as Queue<number>
+        [a, b, c]
     );
 
 
@@ -785,7 +785,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [b, [c, null]] as Queue<number>
+        [b, c]
     );
 
 
@@ -808,7 +808,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        null
+        []
     );
 
 
@@ -831,7 +831,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [c, [b, null]] as Queue<number>
+        [c, b]
     );
 
 
@@ -856,7 +856,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [d, [e, null]]]] as Queue<number>
+        [a, b, d, e]
     );
 
 
@@ -882,7 +882,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [d, [e, [f, null]]]]] as Queue<number>
+        [a, b, d, e, f]
     );
 
 
@@ -908,7 +908,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [d, [f, null]]]] as Queue<number>
+        [a, b, d, f]
     );
 
 
@@ -934,7 +934,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [f, [e, [d, [c, null]]]]] as Queue<number>
+        [a, f, e, d, c]
     );
 
 
@@ -960,7 +960,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [c, null]]] as Queue<number>
+        [a, b, c]
     );
 
 
@@ -971,7 +971,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [d, [g, null]]] as Queue<number>
+        [a, d, g]
     );
 
 
@@ -982,7 +982,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [b, [f, [h, null]]]] as Queue<number>
+        [a, b, f, h]
     );
 
 
@@ -993,7 +993,7 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [d, [c, null]]] as Queue<number>
+        [a, d, c]
     );
 
 
@@ -1004,6 +1004,6 @@ test("test listgraph depth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        [a, [d, [e, null]]] as Queue<number>
+        [a, d, e]
     );
 });

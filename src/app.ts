@@ -8,7 +8,6 @@ import {
     lg_depth_first, lg_dijkstra_path
 } from "./graphs";
 import { head, is_null, tail } from "./list";
-import { is_empty, head as head_of_queue, dequeue } from "./queue_immutable";
 import { Result, Stream } from "./path";
 import { iterative_maze_generation } from "./maze_generator";
 
@@ -209,19 +208,18 @@ function draw(
 
         // Draw all nodes pending a visit from algorithm
         let in_queue = head(algorithm.algorithm).in_queue;
-        while (!is_empty(in_queue)) {
-            let pos = deepen_index(head_of_queue(in_queue), maze);
+        in_queue.forEach((node) => {
+            let pos = deepen_index(node, maze);
             if (pos !== undefined) {
                 // ljusare cyan
                 algorithm.textures[pos.row][pos.col].tint = 0x34ebb7;
             }
-            in_queue = dequeue(in_queue);
-        }
+        });
 
         // Draw the path taken to reach the current node
         let current_path = head(algorithm.algorithm).path_so_far;
-        while (!is_empty(current_path)) {
-            let pos = deepen_index(head_of_queue(current_path), maze);
+        current_path.forEach((node) => {
+            let pos = deepen_index(node, maze);
             if (pos !== undefined) {
                 if (head(algorithm.algorithm).is_done) {
                     // grön
@@ -231,8 +229,7 @@ function draw(
                     algorithm.textures[pos.row][pos.col].tint = 0xe8c100;
                 }
             }
-            current_path = dequeue(current_path);
-        }
+        });
 
         // Draw the current node
         let current_node = deepen_index(
@@ -255,7 +252,7 @@ function draw(
 
 app.ticker.add(() => {
     mili_seconds += app.ticker.deltaMS;
-    if (mili_seconds >= 10) {
+    if (mili_seconds >= 1) {
         mili_seconds = 0;
         draw(algorithms);
     }

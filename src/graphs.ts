@@ -6,15 +6,16 @@ import {
     Stack, pop, push,
     empty as empty_stack,
     is_empty as is_stack_empty,
-    top as stack_head
+    top as stack_head,
+    stack_to_array
 } from "./stack";
 import {
     Queue, dequeue, enqueue,
     empty as empty_queue,
     is_empty as is_queue_empty,
     head as queue_head,
-    queue
-} from "./queue_immutable";
+    queue_to_array
+} from "./queue_array";
 import {
     PrioQueue,
     dequeue as prio_dequeue,
@@ -229,7 +230,7 @@ export function lg_depth_first(
     // create a data type to store the path to the given node
     // (Path from `start` node)
     // All nodes start with a null path meaning there is no path
-    const path_to_node = Array<Path>(graph.size).fill(null);
+    const path_to_node = Array<Path>(graph.size);
 
     // Queue showing what node is next to check.
     let next_node: Stack<Node> = empty_stack();
@@ -240,16 +241,16 @@ export function lg_depth_first(
     function lg_depth_first_visit(
         node: Node,
         path_so_far:
-        Queue<Node>
-    ): Queue<Node> {
+        Array<Node>
+    ): Array<Node> {
         exploration_state[node] = visited;
         visited_nodes.push(node);
         next_node = push(node, next_node);
-        return enqueue(node, path_so_far);
+        return path_so_far.concat(node);
     }
 
     // enqueues the starting node with a empty path
-    path_to_node[start] = lg_depth_first_visit(start, empty_stack());
+    path_to_node[start] = lg_depth_first_visit(start, Array<Node>());
 
     // Stepwise progression of dfs algorithm,
     // can easily be made into a stream call.
@@ -259,7 +260,7 @@ export function lg_depth_first(
             next_node = pop(next_node);
             if (node === end) {
                 return {
-                    in_queue: next_node,
+                    in_queue: stack_to_array(next_node),
                     visited_nodes: visited_nodes,
                     current_node: node,
                     path_so_far: path_to_node[node],
@@ -288,7 +289,7 @@ export function lg_depth_first(
             for_each((node) => visited_nodes_this_loop.push(node), non_visited);
 
             return {
-                in_queue: next_node,
+                in_queue: stack_to_array(next_node),
                 visited_nodes: visited_nodes,
                 current_node: node,
                 path_so_far: path_to_node[node],
@@ -296,7 +297,7 @@ export function lg_depth_first(
             };
         } else {
             return {
-                in_queue: next_node,
+                in_queue: stack_to_array(next_node),
                 visited_nodes: visited_nodes,
                 current_node: -1,
                 path_so_far: path_to_node[end],
@@ -308,10 +309,10 @@ export function lg_depth_first(
     // Initialize stream with only starting node in the stack
     const stream: Stream<Result> = pair(
         {
-            in_queue: next_node,
+            in_queue: stack_to_array(next_node),
             visited_nodes: Array<Node>(),
             current_node: -1,
-            path_so_far: null,
+            path_so_far: Array<Node>(),
             is_done: false
         },
         () => data_stream()
@@ -388,7 +389,7 @@ export function lg_breadth_first(
     // create a data type to store the path to the given node
     // (Path from `start` node)
     // All nodes start with a null path meaning there is no path
-    const path_to_node = Array<Path>(graph.size).fill(null);
+    const path_to_node = Array<Path>(graph.size);
 
     // Queue showing what node is next to check.
     let next_node: Queue<Node> = empty_queue();
@@ -398,26 +399,27 @@ export function lg_breadth_first(
     // enqueues node to queue of nodes to check.
     function lg_breadth_first_visit(
         node: Node,
-        path_so_far: Queue<Node>
-    ): Queue<Node> {
+        path_so_far: Array<Node>
+    ): Array<Node> {
         exploration_state[node] = visited;
         visited_nodes.push(node);
-        next_node = enqueue(node, next_node);
-        return enqueue(node, path_so_far);
+        enqueue(node, next_node);
+        path_so_far.concat(node);
+        return path_so_far.concat(node);
     }
 
     // enqueues the starting node with a empty path
-    path_to_node[start] = lg_breadth_first_visit(start, empty_queue());
+    path_to_node[start] = lg_breadth_first_visit(start, Array<Node>());
 
     // Stepwise progression of bfs algorithm,
     // can easily be made into a stream call.
     function lg_breadth_first_step(): Result {
         if (!is_queue_empty(next_node)) {
             const node = queue_head(next_node);
-            next_node = dequeue(next_node);
+            dequeue(next_node);
             if (node === end) {
                 return {
-                    in_queue: next_node,
+                    in_queue: queue_to_array(next_node),
                     visited_nodes: visited_nodes,
                     current_node: node,
                     path_so_far: path_to_node[node],
@@ -446,7 +448,7 @@ export function lg_breadth_first(
             for_each((node) => visited_nodes_this_loop.push(node), non_visited);
 
             return {
-                in_queue: next_node,
+                in_queue: queue_to_array(next_node),
                 visited_nodes: visited_nodes,
                 current_node: node,
                 path_so_far: path_to_node[node],
@@ -454,7 +456,7 @@ export function lg_breadth_first(
             };
         } else {
             return {
-                in_queue: next_node,
+                in_queue: queue_to_array(next_node),
                 visited_nodes: visited_nodes,
                 current_node: -1,
                 path_so_far: path_to_node[end],
@@ -466,10 +468,10 @@ export function lg_breadth_first(
     // Initialize stream with only starting node in the queue
     const stream: Stream<Result> = pair(
         {
-            in_queue: next_node,
+            in_queue: queue_to_array(next_node),
             visited_nodes: Array<Node>(),
             current_node: -1,
-            path_so_far: null,
+            path_so_far: Array<Node>(),
             is_done: false
         },
         () => data_stream()
@@ -538,7 +540,7 @@ export function lg_dijkstra_path(
             completed.push(node);
             if (node === end) {
                 return {
-                    in_queue: queue(prio_queue_head(left_to_check)),
+                    in_queue: Array(prio_queue_head(left_to_check)),
                     visited_nodes: completed,
                     current_node: node,
                     path_so_far: lg_dijkstra_create_path(node),
@@ -553,7 +555,7 @@ export function lg_dijkstra_path(
             );
 
             return {
-                in_queue: queue(prio_queue_head(left_to_check)),
+                in_queue: Array(prio_queue_head(left_to_check)),
                 visited_nodes: completed,
                 current_node: node,
                 path_so_far: lg_dijkstra_create_path(node),
@@ -562,10 +564,10 @@ export function lg_dijkstra_path(
         } else {
             // No path found
             return {
-                in_queue: empty_queue(),
+                in_queue: Array<Node>(),
                 visited_nodes: completed,
                 current_node: -1,
-                path_so_far: null,
+                path_so_far: Array<Node>(),
                 is_done: true
             };
         }
@@ -581,19 +583,19 @@ export function lg_dijkstra_path(
             }
 
             // create path by enqueuing elements from right to left
-            return queue<Node>(...reversed_path.reverse());
+            return reversed_path.reverse();
         } else {
-            return null;
+            return Array<Node>();
         } // no path
     }
 
     // Initialize stream with only starting node in the stack
     const stream: Stream<Result> = pair(
         {
-            in_queue: queue(prio_queue_head(left_to_check)),
+            in_queue: Array(prio_queue_head(left_to_check)),
             visited_nodes: Array<Node>(),
             current_node: -1,
-            path_so_far: null,
+            path_so_far: Array<Node>(),
             is_done: false
         },
         () => data_stream()
@@ -693,7 +695,7 @@ export function lg_a_star_path(
             completed.push(node);
             if (node === end) {
                 return {
-                    in_queue: queue(prio_queue_head(left_to_check)),
+                    in_queue: Array(prio_queue_head(left_to_check)),
                     visited_nodes: completed,
                     current_node: node,
                     path_so_far: lg_a_star_create_path(node),
@@ -708,7 +710,7 @@ export function lg_a_star_path(
             );
 
             return {
-                in_queue: queue(prio_queue_head(left_to_check)),
+                in_queue: Array(prio_queue_head(left_to_check)),
                 visited_nodes: completed,
                 current_node: node,
                 path_so_far: lg_a_star_create_path(node),
@@ -717,10 +719,10 @@ export function lg_a_star_path(
         } else {
             // No path found
             return {
-                in_queue: empty_queue(),
+                in_queue: Array<Node>(),
                 visited_nodes: completed,
                 current_node: -1,
-                path_so_far: null,
+                path_so_far: Array<Node>(),
                 is_done: true
             };
         }
@@ -736,19 +738,19 @@ export function lg_a_star_path(
             }
 
             // create path by enqueuing elements from right to left
-            return queue<Node>(...reversed_path.reverse());
+            return reversed_path.reverse();
         } else {
-            return null;
+            return Array<Node>();
         } // no path
     }
 
     // Initialize stream with only starting node in the stack
     const stream: Stream<Result> = pair(
         {
-            in_queue: queue(prio_queue_head(left_to_check)),
+            in_queue: Array(prio_queue_head(left_to_check)),
             visited_nodes: Array<Node>(),
             current_node: -1,
-            path_so_far: null,
+            path_so_far: Array<Node>(),
             is_done: false
         },
         () => data_stream()
