@@ -138,7 +138,9 @@ export function display_queue<T>(q: Queue<T>): void {
  * @param q queue to create a array from
  */
 export function queue_to_array<T>(q: Queue<T>): Array<T> {
-    const result_array = Array<T>(q[queue_head] - q[next_empty]);
+    const result_array = (q[next_empty] - q[queue_head]) === 0
+        ? Array<T>()
+        : Array<T>((q[next_empty] - q[queue_head]));
     for (let q_index = q[queue_head];
         q_index < q[next_empty];
         q_index++) {
