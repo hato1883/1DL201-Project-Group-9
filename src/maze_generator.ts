@@ -16,7 +16,11 @@ import { filter, length, list_ref } from "./list";
 // Work in progress...
 
 
-export function iterative_maze_generation(side: number, seed = 42): Maze {
+export function iterative_maze_generation(
+    side: number,
+    seed: number = 42,
+    multiple_paths: boolean = false
+): Maze {
     const random_instance = splitmix32(seed);
 
     // # # # # # # #
@@ -163,6 +167,27 @@ export function iterative_maze_generation(side: number, seed = 42): Maze {
         //  list(2, 4),
         //  list(3)]
             }
+        }
+    }
+
+    // if multiple_paths
+    if (multiple_paths) {
+        // Then punch holes in the walls at random locations
+        // for every odd nuber row
+        for (let row = 1; row < result_maze.height - 2; row = row + 1) {
+            // get a random odd number colum
+            let col = random_instance.random_int(1, result_maze.width - 3);
+            if (row % 2 === 0) {
+                // force col to be even to be odd
+                col = col + ((col % 2) - 1);
+            } else {
+                // force col to be even to get best optional path
+                col = col + ((col) % 2);
+            }
+            col = col >= result_maze.width - 2 ? col - 1 : col;
+
+            // set this random spot to be a path
+            result_maze.matrix[row][col] = free;
         }
     }
 
