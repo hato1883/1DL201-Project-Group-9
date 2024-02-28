@@ -21,7 +21,8 @@
     "@stylistic/restrict-plus-operands": "off",
 
     // if the type is "obvious" to the compiler, you may as well skip the type declaration
-    "@typescript-eslint/no-inferrable-types": "warn",
+    // Set to off meaning allways type even if obvious.
+    "@typescript-eslint/no-inferrable-types": "off",
 
     // all functions must have explicit return types
     "@typescript-eslint/explicit-function-return-type": "error",
