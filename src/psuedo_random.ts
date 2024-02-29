@@ -21,12 +21,13 @@ export function splitmix32(a: number): {
     function random(): number {
         // Bitwise OR assigment operation equivalent to a = a | 0
         a |= 0;
+
         // Bitwise OR assigment operation with 0x9e3779b9.
         // 0x9e3779b9 is the Golden Ratio 
         // constant used for better hash scattering
         // See https://softwareengineering.stackexchange.com/a/402543 
         a = (a + 0x9e3779b9) | 0;
-        
+
         // performs a bitwise XOR operation ('^') 
         // between the variable 'a' and the 
         // result of a right shift('>>>') 
@@ -56,11 +57,13 @@ export function splitmix32(a: number): {
         // floating point number between 0 and 1.
         return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
     }
+
     // Uses the pseudo random hash to return an 
     // interger between a minimum and maximum, defaults with [0, 1]
     function random_int(min = 0, max = 1): number {
         return Math.round((random() * (max - min)) + min);
     }
+
     // Uses the pseudo random hash to return a 
     // floating point number scaled to[min, max) max exclusive.
     // Defaults to a number between 0 and 1
