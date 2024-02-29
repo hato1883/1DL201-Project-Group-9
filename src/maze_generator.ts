@@ -10,48 +10,32 @@ import {
 import { splitmix32 } from "./psuedo_random";
 import { filter, length, list_ref } from "./list";
 
-// An algorithm that uses the recursive division method specified here
 // eslint-disable-next-line @stylistic/max-len
-// https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_division_method
-// Work in progress...
+// An algorithm that uses the iterative division method specified here
+// https://en.wikipedia.org/wiki/Maze_generation_algorithm#Iterative_implementation_(with_stack)
 
-
+/**
+ * 
+ * @param side a number decides the size of the maze
+ * @param seed a number that gives us a seed to give the our Pseudo-random
+ * number generator. Defaults to 42, if not given any other number.
+ * @param multiple_paths Specifies whether there should be multiple paths
+ * to the end node or not. Defaults to false, if not given any other value.
+ * @returns A maze of specified size generated using the specified seed.
+ * Which is a record of 
+ * { width: number; height : number; matrix: Array < Array< MazeBlock > >; }  
+ */
 export function iterative_maze_generation(
     side: number,
     seed: number = 42,
     multiple_paths: boolean = false
 ): Maze {
     const random_instance = splitmix32(seed);
-
-    // # # # # # # #
-    // # O X O O O #
-    // # X # O # # #
-    // # O # O O O #
-    // # O # O # O #
-    // # O O O # O #
-    // # # # # # # #
-    //     /\
-    //     ||
-    //     \/
-    //   O O O
-    //   O O O
-    //   O O O
-
-    //   O O O
-    //   O O O
-    //   O O O
     let maze = new_maze(side, free);
     const unconnected_maze = maze_to_listgraph(maze);
 
     let matrix = Array<Array<MazeBlock>>((maze.width * 2) + 1);
 
-    // # # # # # # #
-    // # O # O # O #
-    // # # # # # # #
-    // # O # O # O #
-    // # # # # # # #
-    // # O # O # O #
-    // # # # # # # #
     for (let r_index = 0; r_index < (maze.width * 2) + 1; r_index++) {
         matrix[r_index] = Array<MazeBlock>((maze.width * 2) + 1);
         for (let c_index = 0; c_index < (maze.width * 2) + 1; c_index++) {
@@ -71,9 +55,6 @@ export function iterative_maze_generation(
         matrix: matrix
     };
 
-    //   O O O
-    //   O O O
-    //   O O O
     function remove_wall(st_node: number, nd_node: number): void {
         let target_col = ((((st_node % side) * 2) + 1)
             - ((st_node % side) - (nd_node % side)));
@@ -87,15 +68,6 @@ export function iterative_maze_generation(
         }
         result_maze.matrix[target_row][target_col] = free;
     }
-
-    //  0 1 2 3 4 5 6
-    // 0# # # # # # #
-    // 1# O # O # O # [0][0] - start index
-    // 2# # # # # # # [1][0] - tear down the wall
-    // 3# O # O # O # [2][0] - target index
-    // 4# # # # # # #
-    // 5# O # O # O #
-    // 6# # # # # # #
 
     // Exploration states
     const initialized = 0;
@@ -129,7 +101,7 @@ export function iterative_maze_generation(
 
         // 2.2 If the current cell has any unvisited neighbours
         if (num_unvisited > 0) {
-        // 2.2.1 Push current cell to the stack
+            // 2.2.1 Push current cell to the stack
             visit(current_cell);
 
             // 2.2.2 Choose one of the unvisited neighbours
@@ -146,26 +118,6 @@ export function iterative_maze_generation(
                 // 2.2.4 Mark the chosen cell as visited
                 // and push it to the stack
                 visit(random_negihbour);
-
-        // 2.2.3 Remove wall
-        // # # # # # # #
-        // # O # O # O #
-        // # # # # # # #
-        // # O # O # O #
-        // # # # # # # #
-        // # O # O # O #
-        // # # # # # # #
-        // [list(2),
-        //  list(),
-        //  list(0, 4),
-        //  list(),
-        //  list(2)]
-        // [list(1),
-        // O <-> O <-> O
-        //  list(0, 2),
-        //  list(1, 3),
-        //  list(2, 4),
-        //  list(3)]
             }
         }
     }
@@ -173,9 +125,9 @@ export function iterative_maze_generation(
     // if multiple_paths
     if (multiple_paths) {
         // Then punch holes in the walls at random locations
-        // for every odd nuber row
+        // for every odd numbered row
         for (let row = 1; row < result_maze.height - 2; row = row + 1) {
-            // get a random odd number colum
+            // get a random odd numbered colum
             let col = random_instance.random_int(1, result_maze.width - 3);
             if (row % 2 === 0) {
                 // force col to be even to be odd
