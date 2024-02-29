@@ -7,7 +7,7 @@ import {
     type Stack, empty as empty_stack,
     push, pop, top, is_empty
 } from "./stack";
-import { splitmix32 } from "./psuedo_random";
+import { splitmix32 } from "./pseudo_random";
 import { filter, length, list_ref } from "./list";
 
 // eslint-disable-next-line @stylistic/max-len
