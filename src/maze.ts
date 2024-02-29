@@ -10,8 +10,6 @@ export const wall = false;
 export type MazeBlock = Wall | Free;
 
 
-// TODO 
-// fixed size tuple of generic length try to incorperate maze size into the type
 
 export type Maze = {
     width: number;
@@ -19,15 +17,43 @@ export type Maze = {
     matrix: Array<Array<MazeBlock>>;
 
 };
-
+/**
+ * Convienience function: returns whether the block is free or not.
+ * @param maze_block The block we need to look at
+ * @returns True if path, else false
+ */
 export function is_path(maze_block: MazeBlock): maze_block is Free {
     return maze_block;
 }
-
+/**
+ * Convienience function: returns whether the block a wall or not.
+ * @param maze_block Takes a block to look at
+ * @returns True if wall, else false
+ */
 export function is_wall(maze_block: MazeBlock): maze_block is Wall {
     return !maze_block;
 }
-
+/**
+ * 
+ * @param size the size of the array
+ * @param default_block what the array should be filled with, defaults to free.
+ * @returns a Maze record with a {width: size, height: size, matrix: matrix}.
+ * The matrix will be a two-dimensional array of size by size (size x size)
+ * @example
+ * // Returns a record with a 3x3 matrix 
+ * let nm = new_maze(3);
+ * 
+ * // Results in the record 
+ * {
+ *  width : 3,
+ *  height: 3,
+ *  matrix: [
+ *              [free, free, free],
+ *              [free, free, free],
+ *              [free, free, free]
+ *  ]
+ * }
+ */
 export function new_maze(size: number, default_block: MazeBlock = free): Maze {
     const matrix = Array<Array<MazeBlock>>(size);
     matrix.fill(Array<MazeBlock>(size));
