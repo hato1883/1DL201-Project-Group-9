@@ -572,7 +572,7 @@ test("test listgraph breadth first search", () => {
     expect(
         result.path_so_far
     ).toStrictEqual(
-        []
+        Array<Node>()
     );
 
 
@@ -803,11 +803,11 @@ test("test listgraph depth first search", () => {
             b
         )
     );
-
+    console.log(Array<Node>());
     expect(
         result.path_so_far
     ).toStrictEqual(
-        []
+        Array<Node>()
     );
 
 
