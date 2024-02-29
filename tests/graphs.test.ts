@@ -803,7 +803,6 @@ test("test listgraph depth first search", () => {
             b
         )
     );
-    console.log(Array<Node>());
     expect(
         result.path_so_far
     ).toStrictEqual(
