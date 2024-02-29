@@ -10,13 +10,13 @@ export const wall = false;
 export type MazeBlock = Wall | Free;
 
 
-
 export type Maze = {
     width: number;
     height: number;
     matrix: Array<Array<MazeBlock>>;
 
 };
+
 /**
  * Convienience function: returns whether the block is free or not.
  * @param maze_block The block we need to look at
@@ -25,6 +25,7 @@ export type Maze = {
 export function is_path(maze_block: MazeBlock): maze_block is Free {
     return maze_block;
 }
+
 /**
  * Convienience function: returns whether the block a wall or not.
  * @param maze_block Takes a block to look at
@@ -33,6 +34,7 @@ export function is_path(maze_block: MazeBlock): maze_block is Free {
 export function is_wall(maze_block: MazeBlock): maze_block is Wall {
     return !maze_block;
 }
+
 /**
  * 
  * @param size the size of the array
