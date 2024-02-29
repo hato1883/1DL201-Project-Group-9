@@ -230,7 +230,7 @@ export function lg_depth_first(
     // create a data type to store the path to the given node
     // (Path from `start` node)
     // All nodes start with a null path meaning there is no path
-    const path_to_node = Array<Path>(graph.size);
+    const path_to_node = Array<Path>(graph.size).fill(Array<Node>());
 
     // Queue showing what node is next to check.
     let next_node: Stack<Node> = empty_stack();
@@ -389,7 +389,7 @@ export function lg_breadth_first(
     // create a data type to store the path to the given node
     // (Path from `start` node)
     // All nodes start with a null path meaning there is no path
-    const path_to_node = Array<Path>(graph.size);
+    const path_to_node = Array<Path>(graph.size).fill(Array<Node>());
 
     // Queue showing what node is next to check.
     let next_node: Queue<Node> = empty_queue();
