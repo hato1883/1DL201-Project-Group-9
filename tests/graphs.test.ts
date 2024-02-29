@@ -1,4 +1,6 @@
 import {
+    lg_a_star_path,
+    lg_dijkstra_path,
     undirected, EdgeList,
     MatrixGraph, ListGraph,
     mg_from_edges, mg_new,
@@ -7,6 +9,8 @@ import {
 } from "../src/graphs";
 import { head, is_null, list, tail } from "../src/list";
 import { Result, Stream } from "../src/path";
+import { iterative_maze_generation } from "../src/maze_generator";
+import { maze_to_listgraph } from "../src/maze";
 
 
 /**
@@ -999,6 +1003,30 @@ test("test listgraph depth first search", () => {
         lg_depth_first(listgraph, a, e)
     );
 
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, d, e]
+    );
+});
+test("test A* search", () => {
+    let maze = iterative_maze_generation(5);
+    let lg = maze_to_listgraph(maze);
+
+    let result: Result = eval_stream(lg_a_star_path(lg,maze,0,5));
+    expect(
+        result.is_done
+    ).toStrictEqual(true
+        
+    );
+
+});
+
+test("test lg_dijkstra_path",() => { 
+    let maze = iterative_maze_generation(5);
+    let lg = maze_to_listgraph(maze);
+
+    let result: Result = eval_stream(lg_dijkstra_path(lg,0,5));
     expect(
         result.path_so_far
     ).toStrictEqual(
