@@ -21,7 +21,9 @@ import { filter, length, list_ref } from "./list";
  * number generator. Defaults to 42, if not given any other number.
  * @param multiple_paths Specifies whether there should be multiple paths
  * to the end node or not. Defaults to false, if not given any other value.
- * @returns 
+ * @returns A maze of specified size generated using the specified seed.
+ * Which is a record of 
+ * { width: number; height : number; matrix: Array<Array<MazeBlock>>; }  
  */
 export function iterative_maze_generation(
     side: number,
