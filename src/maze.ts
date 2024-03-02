@@ -58,10 +58,12 @@ export function is_wall(maze_block: MazeBlock): maze_block is Wall {
  */
 export function new_maze(size: number, default_block: MazeBlock = free): Maze {
     const matrix = Array<Array<MazeBlock>>(size);
-    matrix.fill(Array<MazeBlock>(size));
-    matrix.forEach((row) => {
-        row.fill(default_block);
-    });
+    for (let row = 0; row < size; row++) {
+        matrix[row] = Array<MazeBlock>(size);
+        for (let col = 0; col < size; col++) {
+            matrix[row][col] = default_block;
+        }
+    }
     return {
         width: size,
         height: size,
