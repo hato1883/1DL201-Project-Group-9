@@ -563,6 +563,7 @@ export function lg_dijkstra_path(
             };
         } else {
             // No path found
+            // unreachable due to all nodes bing queued at the start.
             return {
                 in_queue: Array<Node>(),
                 visited_nodes: completed,
@@ -718,6 +719,7 @@ export function lg_a_star_path(
             };
         } else {
             // No path found
+            // unreachable due to all nodes bing queued at the start.
             return {
                 in_queue: Array<Node>(),
                 visited_nodes: completed,

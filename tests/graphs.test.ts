@@ -3,9 +3,10 @@ import {
     MatrixGraph, ListGraph,
     mg_from_edges, mg_new,
     lg_from_edges, lg_new, lg_transpose,
-    lg_depth_first, lg_breadth_first
+    lg_depth_first, lg_breadth_first, lg_dijkstra_path, lg_a_star_path
 } from "../src/graphs";
 import { head, is_null, list, tail } from "../src/list";
+import { Maze, maze_to_listgraph, new_maze } from "../src/maze";
 import { Result, Stream } from "../src/path";
 
 
@@ -1003,5 +1004,371 @@ test("test listgraph depth first search", () => {
         result.path_so_far
     ).toStrictEqual(
         [a, d, e]
+    );
+});
+
+// Same path as BFS
+test("test listgraph dijkstra_path search", () => {
+    let result: Result = eval_stream(
+        lg_dijkstra_path(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(a)
+                    ],
+                size: 2
+            } as ListGraph,
+            a,
+            b
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, b]
+    );
+
+    result = eval_stream(
+        lg_dijkstra_path(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c),
+                        list(a)
+                    ],
+                size: 3
+            } as ListGraph,
+            a,
+            c
+        )
+    );
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, b, c]
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c),
+                        list(a)
+                    ],
+                size: 3
+            } as ListGraph,
+            b,
+            c
+        )
+    );
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [b, c]
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c),
+                        list()
+                    ],
+                size: 3
+            } as ListGraph,
+            c,
+            b
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        Array<Node>()
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c, a),
+                        list(a, b)
+                    ],
+                size: 3
+            } as ListGraph,
+            c,
+            b
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [c, b]
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c, d),
+                        list(e),
+                        list(e),
+                        list()
+                    ],
+                size: 5
+            } as ListGraph,
+            a,
+            e
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, b, c, e]
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c, d),
+                        list(e, f),
+                        list(e),
+                        list(f),
+                        list()
+                    ],
+                size: 6
+            } as ListGraph,
+            a,
+            f
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, b, c, f]
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(
+            {
+                adj:
+                    [
+                        list(b),
+                        list(c, d),
+                        list(e),
+                        list(e, f),
+                        list(f),
+                        list()
+                    ],
+                size: 6
+            } as ListGraph,
+            a,
+            f
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, b, d, f]
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(listgraph, a, g)
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, d, g]
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(listgraph, a, h)
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, b, f, h]
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(listgraph, a, c)
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, b, c]
+    );
+
+
+    result = eval_stream(
+        lg_dijkstra_path(listgraph, a, e)
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [a, d, e]
+    );
+
+
+    let maze = new_maze(3);
+    maze.matrix[0][1] = false;
+    maze.matrix[1][1] = false;
+    maze.matrix[2][1] = false;
+    result = eval_stream(
+        lg_dijkstra_path(
+            maze_to_listgraph(maze),
+            0,
+            8
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        []
+    );
+});
+
+
+test("test listgraph A* search", () => {
+    let maze: Maze;
+    maze = new_maze(2);
+    let result: Result = eval_stream(
+        lg_a_star_path(
+            maze_to_listgraph(maze),
+            maze,
+            0,
+            3
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [0, 1, 3]
+    );
+
+
+    maze = new_maze(3);
+    result = eval_stream(
+        lg_a_star_path(
+            maze_to_listgraph(maze),
+            maze,
+            0,
+            8
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [0, 1, 2, 5, 8]
+    );
+
+
+    maze = new_maze(3);
+    maze.matrix[0][1] = false;
+    result = eval_stream(
+        lg_a_star_path(
+            maze_to_listgraph(maze),
+            maze,
+            0,
+            8
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [0, 3, 4, 5, 8]
+    );
+
+
+    maze = new_maze(3);
+    maze.matrix[0][1] = false;
+    maze.matrix[1][1] = false;
+    result = eval_stream(
+        lg_a_star_path(
+            maze_to_listgraph(maze),
+            maze,
+            0,
+            8
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [0, 3, 6, 7, 8]
+    );
+
+
+    maze = new_maze(3);
+    maze.matrix[0][1] = false;
+    maze.matrix[1][1] = false;
+    result = eval_stream(
+        lg_a_star_path(
+            maze_to_listgraph(maze),
+            maze,
+            0,
+            2
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        [0, 3, 6, 7, 8, 5, 2]
+    );
+
+
+    maze = new_maze(3);
+    maze.matrix[0][1] = false;
+    maze.matrix[1][1] = false;
+    maze.matrix[2][1] = false;
+    result = eval_stream(
+        lg_a_star_path(
+            maze_to_listgraph(maze),
+            maze,
+            0,
+            8
+        )
+    );
+
+    expect(
+        result.path_so_far
+    ).toStrictEqual(
+        []
     );
 });
