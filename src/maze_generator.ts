@@ -55,16 +55,33 @@ export function iterative_maze_generation(
     };
 
     function remove_wall(st_node: number, nd_node: number): void {
-        let target_col = ((((st_node % side) * 2) + 1)
-            - ((st_node % side) - (nd_node % side)));
-        while (target_col >= result_maze.width) {
-            target_col -= result_maze.width;
-        }
-        let target_row = (((Math.floor(st_node / side) * 2) + 1)
-            - (Math.floor(st_node / side) - Math.floor(nd_node / side)));
-        while (target_col >= result_maze.width) {
-            target_col -= result_maze.width;
-        }
+        // Get col in reduced maze
+        const col_in_small = (st_node % side);
+
+        // Convert to col index from small to large
+        const col_in_large = (col_in_small * 2) + 1;
+
+        // target col offset left/right/same (-1, 1, 0).
+        const col_offset = (st_node % side) - (nd_node % side);
+
+        // Offset col_in_large to get target.
+        let target_col = col_in_large - col_offset;
+
+
+        // Get row in reduced maze
+        const row_in_small = Math.trunc(st_node / side);
+
+        // Convert to row index from small to large
+        const row_in_large = (row_in_small * 2) + 1;
+
+        // target row offset left/right/same (-1, 1, 0).
+        const row_offset = Math.trunc(st_node / side)
+            - Math.trunc(nd_node / side);
+
+        // Offset col_in_large to get target.
+        let target_row = row_in_large - row_offset;
+
+        // Update set target to a path.
         result_maze.matrix[target_row][target_col] = free;
     }
 
