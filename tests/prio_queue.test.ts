@@ -228,6 +228,12 @@ test("test updating prio of item in queue", () => {
         [0, 4, [[3, "4"], [0, "1"], [0, "2"], [0, "3"]]]
     );
 
+    // test updating of non existing element.
+    update_prio(0, "5", empty_queue);
+    expect(empty_queue).toStrictEqual(
+        [0, 4, [[3, "4"], [0, "1"], [0, "2"], [0, "3"]]]
+    );
+
     update_prio(10, "4", empty_queue);
     expect(empty_queue).toStrictEqual(
         [0, 4, [[10, "4"], [0, "1"], [0, "2"], [0, "3"]]]
