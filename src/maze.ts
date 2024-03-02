@@ -107,9 +107,9 @@ export function flatten_index(
 }
 
 /**
- * Takes a index of a Array an converts it into a 2d index of a given maze
+ * Takes a index of a 1D Array and converts it into a 2D index of a given maze
  * Usefull when doing opperations on the Listgraph representation of the maze
- * and need the 2d matrix index from the node that uses 1d index.
+ * and need the 2D matrix index from the node that uses 1D index.
  * 
  * @example
  * // deepen the index: 5 of a Array into a index of a 3x3 matrix
@@ -122,14 +122,14 @@ export function flatten_index(
  *         [Free, Free, Free]
  *     ]
  * }
- * flatten_index(5, maze)
+ * deepen_index(5, maze)
  * // Returns { row: 1, col: 2 } which is the 6th posistion in this array
  * // [Free, Free, Free, Free, Free, Wall, Free, Free, Free]
  * 
- * @param {number} index Index of the object in a 1d array representation
- * @param {Maze} maze The maze to use to refer to the index 2d representation
+ * @param {number} index Index of the object in a 1D array representation
+ * @param {Maze} maze The maze to use to refer to the index 2D representation
  * @returns { row: number; col: number } A record holding row and colum needed
- * to reach the same object in a 2d representation
+ * to reach the same object in a 2D representation
  */
 export function deepen_index(
     index: number,
