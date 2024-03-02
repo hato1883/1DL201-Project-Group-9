@@ -220,7 +220,7 @@ export function display_queue<T>(q: PrioQueue<T>): void {
  * @param q queue to create a array from
  */
 export function queue_to_array<T>(q: PrioQueue<T>): Array<T> {
-    const result_array = Array<T>(q[next_empty] - q[queue_head]);
+    const result_array = Array<T>();
     for (let q_index = q[queue_head];
         q_index < q[next_empty];
         q_index++) {
