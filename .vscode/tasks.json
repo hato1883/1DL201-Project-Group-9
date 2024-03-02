@@ -9,7 +9,7 @@
 			"problemMatcher": [
 				"$tsc-watch"
 			],
-			"command": "tsc.cmd -p '${fileWorkspaceFolder}/tsconfig.json' --watch",
+			"command": "tsc.cmd -p '${fileWorkspaceFolder}/tsconfig.json' --watch --skipLibCheck",
 			"isBackground": true,
 		},
 		// "tsc: watch - osx" This task is not recoginized by vscode.
