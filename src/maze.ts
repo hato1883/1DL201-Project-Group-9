@@ -150,6 +150,13 @@ export function deepen_index(
  * Converts a maze into a listgraph with edges between
  * each non wall position of the maze
  * 
+ * @example
+ * ```ts
+ * // returns a listgraph with structure
+ * // [list(1, 2), list(0, 3), list(0, 3), list(1, 2)]
+ * maze_to_listgraph(new_maze(2));
+ * ```
+ * 
  * @param maze The maze to convert into a undirected listgraph
  * @returns A undirected listgraph with edges between
  * each non-wall node of the maze
