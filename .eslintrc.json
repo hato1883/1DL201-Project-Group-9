@@ -184,7 +184,7 @@
 
     // Warn user when code is getting to long.
     // (see https://eslint.style/rules/default/max-len for more)
-    "@stylistic/max-len": ["warn", { "code": 80 }],
+    "@stylistic/max-len": ["warn", { "code": 80 , "ignoreUrls": true }],
 
     // Semicolon after each delimiter in interfaces.
     // (see https://eslint.style/rules/default/member-delimiter-style for more)

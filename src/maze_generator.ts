@@ -10,7 +10,6 @@ import {
 import { splitmix32 } from "./pseudo_random";
 import { filter, length, list_ref } from "./list";
 
-// eslint-disable-next-line @stylistic/max-len
 // An algorithm that uses the iterative division method specified here
 // https://en.wikipedia.org/wiki/Maze_generation_algorithm#Iterative_implementation_(with_stack)
 
