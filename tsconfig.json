@@ -1,4 +1,5 @@
 {
+    "type": "module",
     "compilerOptions": {
         "declaration": true,
         "outDir": "./dist",
@@ -8,11 +9,14 @@
         "target": "es6",
         "module": "CommonJS",
         "strict": true,
-        "sourceMap": true,
-        //"inlineSourceMap": true,
-        //"inlineSources": true,
-        "noImplicitAny": true
+        //"sourceMap": true,
+        "inlineSourceMap": true,
+        "inlineSources": true,
+        "noImplicitAny": true,
     },
-    "include": ["./src/**/*", "./tests/**/*"],
-    "exclude": ["./node_modules", "./**/*.spec.ts", "./dist"]
+    "exclude": [
+        "node_modules",
+        "<node_modules>",
+        "./dist/**/*" // This is what fixed it!
+    ],
 }

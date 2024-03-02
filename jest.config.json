@@ -1,15 +1,9 @@
 {
     "transform": {
-        "^.+\\.ts$": "ts-jest"
+        "^.+\\.ts?$": "ts-jest"
     },
-    "rootDir": "./",
     "testRegex": ".*(.test.ts)",
-    "projects": ["<rootDir>"],
     "testEnvironment": "node",
     "preset": "ts-jest",
-    "collectCoverage": true,
-    "coveragePathIgnorePatterns": ["<rootDir>/config/", "<rootDir>/cache/"],
-    "testPathIgnorePatterns": ["<rootDir>/config/", "<rootDir>/cache/"],
-    "transformIgnorePatterns": ["<rootDir>/config/", "<rootDir>/cache/"],
-    "watchPathIgnorePatterns": ["<rootDir>/config/", "<rootDir>/cache/"]
+    "collectCoverage": true
 }
