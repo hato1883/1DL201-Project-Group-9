@@ -28,6 +28,9 @@ const value_pos = 1;
 
 /**
  * Constructs a priority queue without any elements.
+ * @example
+ * empty();
+ * // results in the data structure [0, 0, []]
  * @template T type of all queue elements
  * @returns Returns an empty queue.
  */
@@ -76,9 +79,23 @@ export function queue<T>(...args: Array<[number, T]>): PrioQueue<T> {
 
 /**
  * Checks whether a priority queue is empty.
+ * 
+ * @example <caption> Usage on empty Queue using empty() method</caption>
+ * // results in true
+ * is_empty(empty());
+ * 
+ * @example <caption> Usage on empty Queue using queue() method </caption>
+ * // results in true
+ * is_empty(queue());
+ * 
+ * @example <caption> Usage on a non empty Queue </caption>
+ * // results in false
+ * is_empty(queue([0, 1]));
+ * 
  * @template T type of all queue elements
  * @param q queue to check for emptiness
  * @returns Returns true, if q has elements, false otherwise.
+ * 
  */
 export function is_empty<T>(q: PrioQueue<T>): boolean {
     return q[queue_head] === q[next_empty];
@@ -86,6 +103,18 @@ export function is_empty<T>(q: PrioQueue<T>): boolean {
 
 /**
  * Adds an element to a priority queue.
+ * 
+ * @example <caption> add element "1" with priority 0 to a empty queue</caption>
+ * enqueue(0, "1", empty());
+ * // results in a queue with the element "1" in the first spot.
+ * 
+ * @example <caption> Enqueue 2 elements to the same queue </caption>
+ * const q = empty();
+ * enqueue(0, "1", q);
+ * enqueue(1, "2", q);
+ * // results in a queue with the element
+ * // "1" in the first spot and "2" in the secound
+ * 
  * @template T type of all queue elements
  * @param prio priority of the new element (larger means higher priority)
  * @param e element to add
@@ -115,12 +144,21 @@ export function enqueue<T>(prio: number, e: T, q: PrioQueue<T>): void {
 }
 
 /**
- * Adds an element to a priority queue.
+ * Updates a elements priority in the queue to the new given priority.
+ * 
+ * @example <caption> update the priority of element "1" from 0 to 10</caption>
+ * const q = empty();
+ * enqueue(0, "1", q);
+ * update_prio(10, "1", q)
+ * // results in a queue with the element "1" in the first spot
+ * // with priority 10.
+ * 
+ * @invariant Queue contains the given element.
  * @template T type of all queue elements
- * @param prio priority of the new element (larger means higher priority)
- * @param e element to add
- * @param q queue to add element to
- * @modifies q such that e is added with priority prio
+ * @param prio new priority of the element (larger means higher priority)
+ * @param e element to replace priority of
+ * @param q queue to update priority in
+ * @modifies q such that e has the priority prio
  */
 export function update_prio<T>(prio: number, e: T, q: PrioQueue<T>): void {
     // Find index of element
@@ -155,6 +193,23 @@ function swap<T>(a: Array<T>, i: number, j: number): void {
  * Retrieves the element with the highest priority from the queue.
  * If two elements have the same priority the one that was
  * enqueued first is returned.
+ * 
+ * @example 
+ * <caption> Gets the first element of a non empty queue </caption>
+ * const q = empty();
+ * enqueue(0, "1", q);
+ * head(q)
+ * // results in the element "1".
+ * 
+ * @example 
+ * <caption> Gets the first element of a queue with more elements </caption>
+ * const q = empty();
+ * enqueue(0, "1", q);
+ * enqueue(1, "2", q);
+ * enqueue(2, "3", q);
+ * head(q)
+ * // results in the element "3" due to it having the highest priority.
+ * 
  * @precondition Assumes q to be non-empty
  * @template T type of all queue elements
  * @param q queue to get the highest-priority element of
@@ -169,6 +224,24 @@ export function head<T>(q: PrioQueue<T>): T {
  * Removes the element with highest priority from a queue.
  * If two elements have the same priority the one that was
  * enqueued first is dequeued first.
+ * 
+ * @example 
+ * <caption> removes the first element of a non empty queue </caption>
+ * const q = empty();
+ * enqueue(0, "1", q);
+ * dequeue(q)
+ * // results in a empty queue ([1, 1, [[0, "1"]]]).
+ * 
+ * @example 
+ * <caption> removes the first element of a queue with more elements </caption>
+ * const q = empty();
+ * enqueue(0, "1", q);
+ * enqueue(1, "2", q);
+ * enqueue(2, "3", q);
+ * dequeue(q)
+ * // results in a queue holding "2" then "1"
+ * // [1, 3, [[2, "3"], [1, "2"], [0, "1"]]]
+ * 
  * @precondition Assumes q to be non-empty
  * @template T type of all queue elements
  * @param q queue to remove the element from
@@ -181,6 +254,29 @@ export function dequeue<T>(q: PrioQueue<T>): void {
 
 /**
  * Pretty-prints the contents of a queue to standard output.
+ * 
+ * @example 
+ * <caption> display a empty queue </caption>
+ * display_queue(empty())
+ * // results in cosnole printing "queue()".
+ * 
+ * @example 
+ * <caption> display non empty queue </caption>
+ * const q = empty();
+ * enqueue(0, "1", q);
+ * display_queue(q)
+ * // results in cosnole printing "queue([0,1])".
+ * 
+ * @example 
+ * <caption> display a queue with more elements </caption>
+ * const q = empty();
+ * enqueue(0, "1", q);
+ * enqueue(1, "2", q);
+ * enqueue(2, "3", q);
+ * display_queue(q)
+ * // results in cosnole printing
+ * //"queue([2,3], [1,2], [0,1])".
+ * 
  * @template T type of all queue elements
  * @param q queue to pretty-print
  */
@@ -188,7 +284,7 @@ export function dequeue<T>(q: PrioQueue<T>): void {
 export function display_queue<T>(q: PrioQueue<T>): void {
     let msg = "queue(";
     for (let index = q[queue_head]; index < q[next_empty]; index++) {
-        msg = msg + q[q_arr][index];
+        msg = msg + "[" + q[q_arr][index].toString() + "]";
         if (index + 1 < q[next_empty]) {
             msg = msg + ", ";
         }

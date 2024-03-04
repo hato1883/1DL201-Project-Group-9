@@ -200,17 +200,17 @@ test("test calling display_queue on a queue", () => {
 
     display_queue(([0, 1, [[0, "1"]]] as PrioQueue<unknown>));
     expect(console.log).toHaveBeenCalledTimes(2);
-    expect(console.log).toHaveBeenCalledWith("queue(0,1)");
+    expect(console.log).toHaveBeenCalledWith("queue([0,1])");
 
     display_queue(([0, 2, [[0, "2"], [0, "1"]]] as PrioQueue<unknown>));
     expect(console.log).toHaveBeenCalledTimes(3);
-    expect(console.log).toHaveBeenCalledWith("queue(0,2, 0,1)");
+    expect(console.log).toHaveBeenCalledWith("queue([0,2], [0,1])");
 
     display_queue(
         ([0, 3, [[0, "3"], [0, "2"], [0, "1"]]] as PrioQueue<unknown>)
     );
     expect(console.log).toHaveBeenCalledTimes(4);
-    expect(console.log).toHaveBeenCalledWith("queue(0,3, 0,2, 0,1)");
+    expect(console.log).toHaveBeenCalledWith("queue([0,3], [0,2], [0,1])");
 
     // restore original function
     console_log_mock.mockRestore();
