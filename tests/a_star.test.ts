@@ -46,7 +46,6 @@ test("test listgraph A* search", () => {
     maze = new_maze(2);
     let result: Result = eval_stream(
         lg_a_star_path(
-            maze_to_listgraph(maze),
             maze,
             0,
             3
@@ -63,7 +62,6 @@ test("test listgraph A* search", () => {
     maze = new_maze(3);
     result = eval_stream(
         lg_a_star_path(
-            maze_to_listgraph(maze),
             maze,
             0,
             8
@@ -81,7 +79,6 @@ test("test listgraph A* search", () => {
     maze.matrix[0][1] = false;
     result = eval_stream(
         lg_a_star_path(
-            maze_to_listgraph(maze),
             maze,
             0,
             8
@@ -100,7 +97,6 @@ test("test listgraph A* search", () => {
     maze.matrix[1][1] = false;
     result = eval_stream(
         lg_a_star_path(
-            maze_to_listgraph(maze),
             maze,
             0,
             8
@@ -119,7 +115,6 @@ test("test listgraph A* search", () => {
     maze.matrix[1][1] = false;
     result = eval_stream(
         lg_a_star_path(
-            maze_to_listgraph(maze),
             maze,
             0,
             2
@@ -139,7 +134,6 @@ test("test listgraph A* search", () => {
     maze.matrix[2][1] = false;
     result = eval_stream(
         lg_a_star_path(
-            maze_to_listgraph(maze),
             maze,
             0,
             8

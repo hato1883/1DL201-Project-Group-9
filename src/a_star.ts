@@ -1,7 +1,7 @@
-import { ListGraph, Node, create_path } from "./graphs";
+import { Node, create_path } from "./graphs";
 import { for_each, pair } from "./list";
-import { Maze, deepen_index } from "./maze";
-import { Stream, Result, Path } from "./path";
+import { Maze, deepen_index, maze_to_listgraph } from "./maze";
+import { Stream, Result } from "./path";
 import {
     PrioQueue, enqueue, dequeue, update_prio,
     empty as empty_prio_queue,
@@ -30,12 +30,40 @@ function a_star_heuristic_geuss(
     return -dist;
 }
 
+/**
+ * Runs the A Star algorithm to find a path between start and end
+ * 
+ * @example
+ * ```ts
+ * const maze = new_maze(3, free);
+ * // * - * - * 
+ * // |   |   | 
+ * // * - * - * Paths are shown as - and |
+ * // |   |   | Graph is undriected
+ * // * - * - *
+ * lg_a_star_path(maze, 0, 8);
+ * // results in Queue(0, 1, 2, 5, 8) after evaluating the stream
+ * // meaing 0 -> 1 -> 2 -> 5 -> 8
+ * ```
+ * @param maze_ref the Maze to solve.
+ * @param start the starting node in the maze to search from
+ * @param end the ending  node in the maze you want to reach
+ * @returns A Stream<Result> information regarding
+ * the algorithms path thru the graph. It also contains
+ * the path so far put this path can lead to a postion far away from the
+ * end point. to get a path to the end you need to evaluate the stream
+ * utill the is_done porpertie has evaluated to true.
+ * when is_done is set to true you will have a path from start to end
+ * if such a path exists.
+ */
 export function lg_a_star_path(
-    graph: ListGraph,
     maze_ref: Maze,
     start: Node,
     end: Node
 ): Stream<Result> {
+    // Creates a list graph of the given Maze
+    const graph = maze_to_listgraph(maze_ref);
+
     // Priority Queue showing what node is next to check.
     let left_to_check: PrioQueue<Node> = empty_prio_queue();
 

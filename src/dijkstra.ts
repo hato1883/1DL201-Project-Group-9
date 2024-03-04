@@ -1,6 +1,6 @@
 import { ListGraph, Node, create_path } from "./graphs";
 import { for_each, pair } from "./list";
-import { Stream, Result, Path } from "./path";
+import { Stream, Result } from "./path";
 import {
     PrioQueue, enqueue, dequeue, update_prio,
     empty as empty_prio_queue,
@@ -9,6 +9,42 @@ import {
 
 } from "./prio_queue";
 
+
+/**
+ * Runs the dijkstra algorithm to find a path between start and end,
+ * This dose accounts for weigthed graphs.
+ * 
+ * @example
+ * ```ts
+ * const listgraph: ListGraph = {
+ *     adj: [
+ *         list(1, 3),    // 0: -> 1, -> 3
+ *         list(2, 5),    // 1: -> 2, -> 5
+ *         list(6),       // 2: -> 6
+ *         list(2, 4, 6), // 3: -> 2, -> 4, -> 6
+ *         list(6),       // 4: -> 6
+ *         list(4, 7),    // 5: -> 4, -> 5
+ *         list(),        // 6:
+ *         list(6)        // 7: -> 6
+ *     ],
+ *     size: 8
+ * };
+ * lg_dijkstra_path(listgraph, 0, 6);
+ * // results in Queue(0, 3, 6) after evaluating the stream
+ * // meaing 0 -> 3 -> 6
+ * ```
+ * 
+ * @param graph the listgraph to perform the breadth first search on.
+ * @param start the starting node to search from
+ * @param end the ending node you want to reach
+ * @returns A Stream<Result> information regarding
+ * the algorithms path thru the graph. It also contains
+ * the path so far put this path can lead to a postion far away from the
+ * end point. to get a path to the end you need to evaluate the stream
+ * utill the is_done porpertie has evaluated to true.
+ * when is_done is set to true you will have a path from start to end
+ * if such a path exists.
+ */
 export function lg_dijkstra_path(
     graph: ListGraph,
     start: Node,

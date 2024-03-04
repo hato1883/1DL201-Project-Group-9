@@ -185,7 +185,6 @@ let a_star_algorithm = {
         (app.renderer.height - 20) / 2
     ),
     algorithm: lg_a_star_path(
-        graph,
         maze,
         start,
         end
