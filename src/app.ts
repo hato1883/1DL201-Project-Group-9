@@ -241,8 +241,7 @@ function draw(
                     algorithm.textures[pos.row][pos.col].tint = 0xe8c100;
                 }
             }
-            dequeue(path);
-        }
+        });
 
         // Mark Current node with purple 0xd534eb
         let current_node = deepen_index(
