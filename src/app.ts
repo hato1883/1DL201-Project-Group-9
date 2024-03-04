@@ -16,6 +16,7 @@ const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
 
 const maze: Maze = iterative_maze_generation(50);
+const steps_per_secound = 20;
 
 /**
  * Setsup A array of textures representing the maze
@@ -295,7 +296,7 @@ function draw(
 
 app.ticker.add(() => {
     mili_seconds += app.ticker.deltaMS;
-    if (mili_seconds >= 0) {
+    if (mili_seconds >= 1000 / steps_per_secound) {
         mili_seconds = 0;
         draw(algorithms);
     }
