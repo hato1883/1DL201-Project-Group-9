@@ -1,129 +1,53 @@
 import * as pixi from "pixi.js";
+import {
+    Maze, deepen_index,
+    flatten_index, free, wall, maze_to_listgraph
+} from "./maze";
+import { head, is_null, tail } from "./list";
+import { Result, Stream } from "./path";
+import { iterative_maze_generation } from "./maze_generator";
+import { lg_breadth_first } from "./breadth_first";
+import { lg_depth_first } from "./deapth_first";
+import { lg_dijkstra_path } from "./dijkstra";
+import { lg_a_star_path } from "./a_star";
+import { queue_to_array } from "./queue_array";
 
 const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
 
-const maze_wall = 0;
-const not_visited = 1;
-const visited = 2;
-const queued = 3;
-const next_in_queue = 4;
+const maze: Maze = iterative_maze_generation(50);
+const steps_per_secound = 20;
 
-enum State {
-    maze_wall,
-    not_visited,
-    visited,
-    queued,
-    next_in_queue
-}
-
-const maze = [
-    [
-        maze_wall,
-        not_visited,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited,
-        not_visited,
-        maze_wall,
-        not_visited
-    ],
-    [
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited
-    ],
-    [
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited,
-        not_visited,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        not_visited,
-        maze_wall,
-        maze_wall,
-        not_visited,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        maze_wall,
-        not_visited,
-        not_visited,
-        not_visited,
-        maze_wall,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        not_visited,
-        not_visited,
-        maze_wall,
-        not_visited,
-        not_visited,
-        maze_wall
-    ],
-    [
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall,
-        maze_wall
-    ]
-];
-const cell_height = app.screen.height / maze.length;
-const cell_width = app.screen.width / maze[0].length;
-
-// sometinh ~2 days
-// other [optional] ~3 days
-
-function init_teture_array(
-    maze: Array<Array<State>>
+/**
+ * Setsup A array of textures representing the maze
+ * It can be used to recolor squares of the maze by the draw() method
+ * @param maze Maze object to create textures for
+ * @param container the container to display the textures in
+ * @param width the width of the displayed maze
+ * @param height the height of the displayed maze
+ * @returns A Array of textures representing the given Maze
+ */
+function init_texture_array(
+    maze: Maze,
+    container: pixi.Container,
+    width: number,
+    height: number
 ): Array<Array<pixi.Sprite>> {
-    const result = Array<Array<pixi.Sprite>>(maze.length);
-    maze.forEach((maze_row, row) => {
-        result[row] = Array<pixi.Sprite>(maze_row.length);
+    const cell_height = (width) / maze.height;
+    const cell_width = (height) / maze.width;
+
+    const result = Array<Array<pixi.Sprite>>(maze.height);
+    maze.matrix.forEach((maze_row, row) => {
+        result[row] = Array<pixi.Sprite>(maze.width);
         maze_row.forEach((cell, col) => {
             result[row][col] = new pixi.Sprite(pixi.Texture.WHITE);
             switch (cell) {
-            case maze_wall:
-                result[row][col].tint = 0xa0a0a0;
+            case wall:
+                result[row][col].tint = 0x000000;
                 break;
 
-            case not_visited:
+            case free:
                 result[row][col].tint = 0xffffff;
-                break;
-
-            case visited:
-                result[row][col].tint = 0xc4c4c4;
-                break;
-
-            case queued:
-                result[row][col].tint = 0x3bf7f1;
-                break;
-
-            case next_in_queue:
-                result[row][col].tint = 0xf7b63b;
                 break;
 
             default:
@@ -133,66 +57,248 @@ function init_teture_array(
             result[row][col].width = cell_width;
             result[row][col].height = cell_height;
 
-            result[row][col].position.set(col * cell_width, row * cell_height);
-            app.stage.addChild(result[row][col]);
+            result[row][col].position.set(
+                (col * cell_width),
+                (row * cell_height)
+            );
+
+            container.addChild(result[row][col]);
         });
     });
     return result;
 }
 
-// create a new Sprite from an image path
-// const err = pixi.Sprite.from("/assets/img/ermmm.png");
+type AlgorithmInstance = {
+    textures: Array<Array<pixi.Sprite>>;
+    algorithm: Stream<Result>;
+    start: number;
+    end: number;
+};
 
-// create sprite from url
-// const bunny = pixi.Sprite.from("https://pixijs.com/assets/bunny.png");
+/**
+ * Setsup A array of algorithms that you want to display
+ * @param maze Maze object to create textures for
+ * @param container the container to display the textures in
+ * @param width the width of the displayed maze
+ * @param height the height of the displayed maze
+ * @returns A Array of textures representing the given Maze
+ */
+function init_algortihm_array(
+    maze: Maze
+): Array<AlgorithmInstance> {
+    const graph = maze_to_listgraph(maze);
+    let algorithms: Array<AlgorithmInstance> = [];
 
-const textures = init_teture_array(maze);
-console.log(textures);
 
-let seconds = 0;
+    // Create a container holding breadth first
+    let container = new pixi.Container();
 
-// Listen for animate update
-let row = 3;
-let col = 3;
-app.ticker.add(() => {
-    seconds += app.ticker.deltaMS;
-    if (seconds >= 500) {
-        const old_tint = textures[row][col].tint;
-        textures[row][col].tint = 0xf00f0;
-        seconds = 0;
-        console.log("Randoming");
-        let new_row = 0;
-        let new_col = 0;
-        while (maze[new_row][new_col] === maze_wall) {
-            new_col = col;
-            new_row = row;
-            if (Math.random() > 0.5) {
-                new_row = Math.max(
-                    Math.min(
-                        row + (Math.round(Math.random()) === 0 ? -1 : 1),
-                        maze.length - 1
-                    ),
-                    0
-                );
-            } else {
-                new_col = Math.max(
-                    Math.min(
-                        col + (Math.round(Math.random()) === 0 ? -1 : 1),
-                        maze[row].length - 1
-                    ),
-                    0
-                );
+    let start = flatten_index(1, 1, maze);
+    start = start === undefined ? 0 : start;
+    let end = flatten_index(maze.width - 2, maze.height - 2, maze);
+    end = end === undefined ? 0 : end;
+
+    // Create the record holding textures and the algorithm
+    let breadth_algorithm = {
+        textures: init_texture_array(
+            maze,
+            container,
+            (app.renderer.height - 20) / 2,
+            (app.renderer.height - 20) / 2
+        ),
+        algorithm: lg_breadth_first(
+            graph,
+            start,
+            end
+        ),
+        start,
+        end
+    };
+
+    // add to array of algorithms
+    algorithms.push(breadth_algorithm);
+
+    // add element to main stage
+    app.stage.addChild(container);
+
+
+    // Create a container holding depth first
+    container = new pixi.Container();
+
+    // Move container to right half
+    container.x = (app.screen.width * 1) / 4;
+    container.y = (app.screen.height * 1) / 2;
+
+    // Create the record holding textures and the algorithm
+    let depth_algorithm = {
+        textures: init_texture_array(
+            maze,
+            container,
+            (app.renderer.height - 20) / 2,
+            (app.renderer.height - 20) / 2
+        ),
+        algorithm: lg_depth_first(
+            graph,
+            start,
+            end
+        ),
+        start,
+        end
+    };
+
+    // add to array of algorithms
+    algorithms.push(depth_algorithm);
+
+    // add element to main stage
+    app.stage.addChild(container);
+
+
+    // Create a container holding depth first
+    container = new pixi.Container();
+
+    // Move container to right half
+    container.x = (app.screen.width * 2) / 4;
+
+    // Create the record holding textures and the algorithm
+    let dijkstra_algorithm = {
+        textures: init_texture_array(
+            maze,
+            container,
+            (app.renderer.height - 20) / 2,
+            (app.renderer.height - 20) / 2
+        ),
+        algorithm: lg_dijkstra_path(
+            graph,
+            start,
+            end
+        ),
+        start,
+        end
+    };
+
+    // add to array of algorithms
+    algorithms.push(dijkstra_algorithm);
+
+    // add element to main stage
+    app.stage.addChild(container);
+
+
+    // Create a container holding depth first
+    container = new pixi.Container();
+
+    // Move container to right half
+    container.x = (app.screen.width * 3) / 4;
+    container.y = (app.screen.height * 1) / 2;
+
+    // Create the record holding textures and the algorithm
+    let a_star_algorithm = {
+        textures: init_texture_array(
+            maze,
+            container,
+            (app.renderer.height - 20) / 2,
+            (app.renderer.height - 20) / 2
+        ),
+        algorithm: lg_a_star_path(
+            maze,
+            start,
+            end
+        ),
+        start,
+        end
+    };
+
+    // add to array of algorithms
+    algorithms.push(a_star_algorithm);
+
+    // add element to main stage
+    app.stage.addChild(container);
+
+    return algorithms;
+}
+
+
+const algorithms = init_algortihm_array(maze);
+let mili_seconds = 0;
+
+/**
+ * Takes in a array of Algorithm Instances
+ * that holds a algorithm we want to visualize.
+ * Each call displays the next step of the algorithm.
+ * @param algorithms The alagoritms to update and draw.
+ */
+function draw(
+    algorithms: Array<AlgorithmInstance>
+): void {
+    algorithms.forEach((algorithm) => {
+        // Draw all visited nodes gray 0xb0acb0
+        let visited = head(algorithm.algorithm).visited_nodes;
+        visited.forEach((node) => {
+            let pos = deepen_index(node, maze);
+            if (pos !== undefined) {
+                algorithm.textures[pos.row][pos.col].tint = 0xb0acb0;
+            }
+        });
+
+        // Draw all nodes pending a visit from algorithm light blue 0x34ebb7
+        let in_queue = head(algorithm.algorithm).in_queue;
+        in_queue.forEach((node) => {
+            let pos = deepen_index(node, maze);
+            if (pos !== undefined) {
+                algorithm.textures[pos.row][pos.col].tint = 0x34ebb7;
+            }
+        });
+
+        // Draw the path taken to reach the current node
+        // with green 0x00ff2f if finished else yellow 0xe8c100
+        const path = queue_to_array(head(algorithm.algorithm).path_so_far);
+        path.forEach((node) => {
+            let pos = deepen_index(node, maze);
+            if (pos !== undefined) {
+                if (head(algorithm.algorithm).is_done) {
+                    algorithm.textures[pos.row][pos.col].tint = 0x00ff2f;
+                } else {
+                    algorithm.textures[pos.row][pos.col].tint = 0xe8c100;
+                }
+            }
+        });
+
+        // Mark Current node with purple 0xd534eb
+        let current_node = deepen_index(
+            head(algorithm.algorithm).current_node,
+            maze
+        );
+        if (current_node !== undefined) {
+            algorithm.textures
+                [current_node.row][current_node.col].tint = 0xd534eb;
+        }
+
+        // Mark Start with blue 0x0000ff
+        let start = deepen_index(algorithm.start, maze);
+        if (start !== undefined) {
+            algorithm.textures[start.row][start.col].tint = 0x0000ff;
+        }
+
+        // Mark End with red 0xff0000
+        let end = deepen_index(algorithm.end, maze);
+        if (end !== undefined) {
+            algorithm.textures[end.row][end.col].tint = 0xff0000;
+        }
+
+        if (!head(algorithm.algorithm).is_done) {
+            // Take the next step of the algorithm
+            const stream_tail = tail(algorithm.algorithm);
+            if (!is_null(stream_tail)) {
+                algorithm.algorithm = stream_tail();
             }
         }
+    });
+}
 
-        row = new_row;
-        col = new_col;
-        textures[row][col].tint = old_tint;
-        console.log("row: %d,  col: ", row, col);
-        if (maze[row][col] === not_visited) {
-            maze[row][col] = visited;
-            textures[row][col].tint = 0xff0000;
-        }
+app.ticker.add(() => {
+    mili_seconds += app.ticker.deltaMS;
+    if (mili_seconds >= 1000 / steps_per_secound) {
+        mili_seconds = 0;
+        draw(algorithms);
     }
 
     // just for fun, let's rotate mr rabbit a little

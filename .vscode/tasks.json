@@ -1,5 +1,38 @@
 {
 	"version": "2.0.0",
 	"tasks": [
+		{
+			// Windows specifc tsc.cmd command
+			"label": "tsc: watch - Windows",
+			"type": "shell",
+			"group": "build",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"command": "tsc.cmd -p '${fileWorkspaceFolder}/tsconfig.json' --watch --skipLibCheck",
+			"isBackground": true,
+		},
+		// "tsc: watch - osx" This task is not recoginized by vscode.
+		// might be becuse it being duplicate of "tsc: watch - Linux"
+		{
+			"label": "tsc: watch - osx",
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+		},
+		{
+			"label": "tsc: watch - Linux",
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+		},
     ]
 }

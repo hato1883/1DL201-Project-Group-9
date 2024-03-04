@@ -5,6 +5,41 @@
     "version": "1.0.0",
     "configurations": [
         {
+            // Launch .js file
+            "name": "Launch Program",
+            "type": "node",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            // Path to file current selected file but with `.js` exstension
+            "program": "${workspaceFolder}/${relativeFileDirname}/${fileBasenameNoExtension}.ts",
+            // Output
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
+            // Use "DEBUG CONSOLE" for output, cleaner then "integratedTerminal",
+            // but might cause issues with user inputs later
+            "console": "internalConsole",
+            // Sets focus to "DEBUG CONSOLE" Which has the output of given file
+            "internalConsoleOptions": "openOnSessionStart",
+            //"postDebugTask": "cleanUp",
+            // Complie task used when on Windows OS
+            "windows": {
+                "preLaunchTask": "tsc: watch - Windows"
+            },
+            // Complie task used when on MacOS 
+            "osx": {
+                // task "tsc: watch - osx" can not be found in tasks.json due to unkown error
+                // Using Linux task as they are duplicate
+                "preLaunchTask": "tsc: watch - Linux"
+            },
+            // Complie task used when on Linux
+            "linux": {
+                "preLaunchTask": "tsc: watch - Linux"
+            }
+        },
+        {
             // start a Chrome session that can cooperate with vscode debugger
             "name": "Start Chrome in debug mode",
             "type": "chrome",
