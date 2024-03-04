@@ -17,9 +17,15 @@ document.body.appendChild(app.view);
 
 const maze: Maze = iterative_maze_generation(50);
 
-// sometinh ~2 days
-// other [optional] ~3 days
-
+/**
+ * Setsup A array of textures representing the maze
+ * It can be used to recolor squares of the maze by the draw() method
+ * @param maze Maze object to create textures for
+ * @param container the container to display the textures in
+ * @param width the width of the displayed maze
+ * @param height the height of the displayed maze
+ * @returns A Array of textures representing the given Maze
+ */
 function init_texture_array(
     maze: Maze,
     container: pixi.Container,
@@ -61,153 +67,166 @@ function init_texture_array(
     return result;
 }
 
-// create a new Sprite from an image path
-// const err = pixi.Sprite.from("/assets/img/ermmm.png");
-
-// create sprite from url
-// const bunny = pixi.Sprite.from("https://pixijs.com/assets/bunny.png");
-
-const graph = maze_to_listgraph(maze);
-let algorithms: Array<{
+type AlgorithmInstance = {
     textures: Array<Array<pixi.Sprite>>;
     algorithm: Stream<Result>;
     start: number;
     end: number;
-}> = [];
-
-
-// Create a container holding breadth first
-let container = new pixi.Container();
-
-let start = flatten_index(1, 1, maze);
-start = start === undefined ? 0 : start;
-let end = flatten_index(maze.width - 2, maze.height - 2, maze);
-end = end === undefined ? 0 : end;
-
-// Create the record holding textures and the algorithm
-let breadth_algorithm = {
-    textures: init_texture_array(
-        maze,
-        container,
-        (app.renderer.height - 20) / 2,
-        (app.renderer.height - 20) / 2
-    ),
-    algorithm: lg_breadth_first(
-        graph,
-        start,
-        end
-    ),
-    start,
-    end
 };
 
-// add to array of algorithms
-algorithms.push(breadth_algorithm);
+/**
+ * Setsup A array of algorithms that you want to display
+ * @param maze Maze object to create textures for
+ * @param container the container to display the textures in
+ * @param width the width of the displayed maze
+ * @param height the height of the displayed maze
+ * @returns A Array of textures representing the given Maze
+ */
+function init_algortihm_array(
+    maze: Maze
+): Array<AlgorithmInstance> {
+    const graph = maze_to_listgraph(maze);
+    let algorithms: Array<AlgorithmInstance> = [];
 
-// add element to main stage
-app.stage.addChild(container);
 
+    // Create a container holding breadth first
+    let container = new pixi.Container();
 
-// Create a container holding depth first
-container = new pixi.Container();
+    let start = flatten_index(1, 1, maze);
+    start = start === undefined ? 0 : start;
+    let end = flatten_index(maze.width - 2, maze.height - 2, maze);
+    end = end === undefined ? 0 : end;
 
-// Move container to right half
-container.x = (app.screen.width * 1) / 4;
-container.y = (app.screen.height * 1) / 2;
-
-// Create the record holding textures and the algorithm
-let depth_algorithm = {
-    textures: init_texture_array(
-        maze,
-        container,
-        (app.renderer.height - 20) / 2,
-        (app.renderer.height - 20) / 2
-    ),
-    algorithm: lg_depth_first(
-        graph,
+    // Create the record holding textures and the algorithm
+    let breadth_algorithm = {
+        textures: init_texture_array(
+            maze,
+            container,
+            (app.renderer.height - 20) / 2,
+            (app.renderer.height - 20) / 2
+        ),
+        algorithm: lg_breadth_first(
+            graph,
+            start,
+            end
+        ),
         start,
         end
-    ),
-    start,
-    end
-};
+    };
 
-// add to array of algorithms
-algorithms.push(depth_algorithm);
+    // add to array of algorithms
+    algorithms.push(breadth_algorithm);
 
-// add element to main stage
-app.stage.addChild(container);
+    // add element to main stage
+    app.stage.addChild(container);
 
 
-// Create a container holding depth first
-container = new pixi.Container();
+    // Create a container holding depth first
+    container = new pixi.Container();
 
-// Move container to right half
-container.x = (app.screen.width * 2) / 4;
+    // Move container to right half
+    container.x = (app.screen.width * 1) / 4;
+    container.y = (app.screen.height * 1) / 2;
 
-// Create the record holding textures and the algorithm
-let dijkstra_algorithm = {
-    textures: init_texture_array(
-        maze,
-        container,
-        (app.renderer.height - 20) / 2,
-        (app.renderer.height - 20) / 2
-    ),
-    algorithm: lg_dijkstra_path(
-        graph,
+    // Create the record holding textures and the algorithm
+    let depth_algorithm = {
+        textures: init_texture_array(
+            maze,
+            container,
+            (app.renderer.height - 20) / 2,
+            (app.renderer.height - 20) / 2
+        ),
+        algorithm: lg_depth_first(
+            graph,
+            start,
+            end
+        ),
         start,
         end
-    ),
-    start,
-    end
-};
+    };
 
-// add to array of algorithms
-algorithms.push(dijkstra_algorithm);
+    // add to array of algorithms
+    algorithms.push(depth_algorithm);
 
-// add element to main stage
-app.stage.addChild(container);
+    // add element to main stage
+    app.stage.addChild(container);
 
 
-// Create a container holding depth first
-container = new pixi.Container();
+    // Create a container holding depth first
+    container = new pixi.Container();
 
-// Move container to right half
-container.x = (app.screen.width * 3) / 4;
-container.y = (app.screen.height * 1) / 2;
+    // Move container to right half
+    container.x = (app.screen.width * 2) / 4;
 
-// Create the record holding textures and the algorithm
-let a_star_algorithm = {
-    textures: init_texture_array(
-        maze,
-        container,
-        (app.renderer.height - 20) / 2,
-        (app.renderer.height - 20) / 2
-    ),
-    algorithm: lg_a_star_path(
-        maze,
+    // Create the record holding textures and the algorithm
+    let dijkstra_algorithm = {
+        textures: init_texture_array(
+            maze,
+            container,
+            (app.renderer.height - 20) / 2,
+            (app.renderer.height - 20) / 2
+        ),
+        algorithm: lg_dijkstra_path(
+            graph,
+            start,
+            end
+        ),
         start,
         end
-    ),
-    start,
-    end
-};
+    };
 
-// add to array of algorithms
-algorithms.push(a_star_algorithm);
+    // add to array of algorithms
+    algorithms.push(dijkstra_algorithm);
 
-// add element to main stage
-app.stage.addChild(container);
+    // add element to main stage
+    app.stage.addChild(container);
 
+
+    // Create a container holding depth first
+    container = new pixi.Container();
+
+    // Move container to right half
+    container.x = (app.screen.width * 3) / 4;
+    container.y = (app.screen.height * 1) / 2;
+
+    // Create the record holding textures and the algorithm
+    let a_star_algorithm = {
+        textures: init_texture_array(
+            maze,
+            container,
+            (app.renderer.height - 20) / 2,
+            (app.renderer.height - 20) / 2
+        ),
+        algorithm: lg_a_star_path(
+            maze,
+            start,
+            end
+        ),
+        start,
+        end
+    };
+
+    // add to array of algorithms
+    algorithms.push(a_star_algorithm);
+
+    // add element to main stage
+    app.stage.addChild(container);
+
+    return algorithms;
+}
+
+
+const algorithms = init_algortihm_array(maze);
 let mili_seconds = 0;
 
+/**
+ * Takes in a array of Algorithm Instances
+ * that holds a algorithm we want to visualize.
+ * Each call displays the next step of the algorithm.
+ * @param algorithms The alagoritms to update and draw.
+ */
 function draw(
-    algorithms: Array<{
-        textures: Array<Array<pixi.Sprite>>;
-        algorithm: Stream<Result>;
-        start: number;
-        end: number;
-    }>
+    algorithms: Array<AlgorithmInstance>
 ): void {
     algorithms.forEach((algorithm) => {
         // Draw all visited nodes gray 0xb0acb0
