@@ -1,6 +1,6 @@
 import { ListGraph, Node, create_path } from "./graphs";
 import { filter, for_each, pair } from "./list";
-import { Stream, Result, Path } from "./path";
+import { Stream, Result } from "./path";
 import {
     Stack, push, pop, top,
     empty, is_empty, stack_to_array

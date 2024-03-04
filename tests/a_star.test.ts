@@ -1,32 +1,9 @@
 import { lg_a_star_path } from "../src/a_star";
-import { ListGraph } from "../src/graphs";
-import { list, head, tail, is_null } from "../src/list";
-import { Maze, new_maze, maze_to_listgraph } from "../src/maze";
+import { head, tail, is_null } from "../src/list";
+import { Maze, new_maze } from "../src/maze";
 import { Stream, Result } from "../src/path";
 import { queue } from "../src/queue_array";
 
-
-const a = 0;
-const b = 1;
-const c = 2;
-const d = 3;
-const e = 4;
-const f = 5;
-const g = 6;
-const h = 7;
-const listgraph: ListGraph = {
-    adj: [
-        list(b, d), // A: 0
-        list(c, f), // B: 1
-        list(g), // C: 2
-        list(c, e, g), // D: 3
-        list(g), // E: 4
-        list(e, h), // F: 5
-        list(), // G: 6
-        list(g) // H: 7
-    ],
-    size: 8
-};
 
 function eval_stream(stream: Stream<Result>): Result {
     let return_value = stream;

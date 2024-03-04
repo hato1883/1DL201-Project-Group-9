@@ -1,6 +1,6 @@
 import { ListGraph, Node, create_path } from "./graphs";
 import { filter, for_each, pair } from "./list";
-import { Stream, Result, Path } from "./path";
+import { Stream, Result } from "./path";
 import {
     Queue, enqueue, dequeue, queue_to_array,
     empty as empty_queue,
