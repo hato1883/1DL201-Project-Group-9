@@ -10,12 +10,12 @@ import { lg_breadth_first } from "./breadth_first";
 import { lg_depth_first } from "./deapth_first";
 import { lg_dijkstra_path } from "./dijkstra";
 import { lg_a_star_path } from "./a_star";
-import { dequeue, is_empty, head as queue_head } from "./queue_array";
+import { queue_to_array } from "./queue_array";
 
 const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
 
-const maze: Maze = iterative_maze_generation(50);
+const maze: Maze = iterative_maze_generation(10);
 
 // sometinh ~2 days
 // other [optional] ~3 days
@@ -71,6 +71,8 @@ const graph = maze_to_listgraph(maze);
 let algorithms: Array<{
     textures: Array<Array<pixi.Sprite>>;
     algorithm: Stream<Result>;
+    start: number;
+    end: number;
 }> = [];
 
 
@@ -78,7 +80,9 @@ let algorithms: Array<{
 let container = new pixi.Container();
 
 let start = flatten_index(1, 1, maze);
+start = start === undefined ? 0 : start;
 let end = flatten_index(maze.width - 2, maze.height - 2, maze);
+end = end === undefined ? 0 : end;
 
 // Create the record holding textures and the algorithm
 let breadth_algorithm = {
@@ -90,9 +94,11 @@ let breadth_algorithm = {
     ),
     algorithm: lg_breadth_first(
         graph,
-        start === undefined ? 0 : start,
-        end === undefined ? 0 : end
-    )
+        start,
+        end
+    ),
+    start,
+    end
 };
 
 // add to array of algorithms
@@ -119,9 +125,11 @@ let depth_algorithm = {
     ),
     algorithm: lg_depth_first(
         graph,
-        start === undefined ? 0 : start,
-        end === undefined ? 0 : end
-    )
+        start,
+        end
+    ),
+    start,
+    end
 };
 
 // add to array of algorithms
@@ -147,9 +155,11 @@ let dijkstra_algorithm = {
     ),
     algorithm: lg_dijkstra_path(
         graph,
-        start === undefined ? 0 : start,
-        end === undefined ? 0 : end
-    )
+        start,
+        end
+    ),
+    start,
+    end
 };
 
 // add to array of algorithms
@@ -177,9 +187,11 @@ let a_star_algorithm = {
     algorithm: lg_a_star_path(
         graph,
         maze,
-        start === undefined ? 0 : start,
-        end === undefined ? 0 : end
-    )
+        start,
+        end
+    ),
+    start,
+    end
 };
 
 // add to array of algorithms
@@ -194,67 +206,78 @@ function draw(
     algorithms: Array<{
         textures: Array<Array<pixi.Sprite>>;
         algorithm: Stream<Result>;
+        start: number;
+        end: number;
     }>
 ): void {
     algorithms.forEach((algorithm) => {
-        // Draw all visited nodes
+        // Draw all visited nodes gray 0xb0acb0
         let visited = head(algorithm.algorithm).visited_nodes;
         visited.forEach((node) => {
             let pos = deepen_index(node, maze);
             if (pos !== undefined) {
-                // grå
                 algorithm.textures[pos.row][pos.col].tint = 0xb0acb0;
             }
         });
 
-        // Draw all nodes pending a visit from algorithm
+        // Draw all nodes pending a visit from algorithm light blue 0x34ebb7
         let in_queue = head(algorithm.algorithm).in_queue;
         in_queue.forEach((node) => {
             let pos = deepen_index(node, maze);
             if (pos !== undefined) {
-                // ljusare cyan
                 algorithm.textures[pos.row][pos.col].tint = 0x34ebb7;
             }
         });
 
         // Draw the path taken to reach the current node
-        const path = head(algorithm.algorithm).path_so_far;
-        while (!is_empty(path)) {
-            let pos = deepen_index(queue_head(path), maze);
+        // with green 0x00ff2f if finished else yellow 0xe8c100
+        const path = queue_to_array(head(algorithm.algorithm).path_so_far);
+        path.forEach((node) => {
+            let pos = deepen_index(node, maze);
             if (pos !== undefined) {
                 if (head(algorithm.algorithm).is_done) {
-                    // grön
                     algorithm.textures[pos.row][pos.col].tint = 0x00ff2f;
                 } else {
-                    // gul
                     algorithm.textures[pos.row][pos.col].tint = 0xe8c100;
                 }
             }
-            dequeue(path);
-        }
+        });
 
-        // Draw the current node
+        // Mark Current node with purple 0xd534eb
         let current_node = deepen_index(
             head(algorithm.algorithm).current_node,
             maze
         );
         if (current_node !== undefined) {
-            // lila
             algorithm.textures
                 [current_node.row][current_node.col].tint = 0xd534eb;
         }
 
-        // Take the next step of the algorithm
-        const stream_tail = tail(algorithm.algorithm);
-        if (!is_null(stream_tail)) {
-            algorithm.algorithm = stream_tail();
+        // Mark Start with blue 0x0000ff
+        let start = deepen_index(algorithm.start, maze);
+        if (start !== undefined) {
+            algorithm.textures[start.row][start.col].tint = 0x0000ff;
+        }
+
+        // Mark End with red 0xff0000
+        let end = deepen_index(algorithm.end, maze);
+        if (end !== undefined) {
+            algorithm.textures[end.row][end.col].tint = 0xff0000;
+        }
+
+        if (!head(algorithm.algorithm).is_done) {
+            // Take the next step of the algorithm
+            const stream_tail = tail(algorithm.algorithm);
+            if (!is_null(stream_tail)) {
+                algorithm.algorithm = stream_tail();
+            }
         }
     });
 }
 
 app.ticker.add(() => {
     mili_seconds += app.ticker.deltaMS;
-    if (mili_seconds >= 1) {
+    if (mili_seconds >= 0) {
         mili_seconds = 0;
         draw(algorithms);
     }
