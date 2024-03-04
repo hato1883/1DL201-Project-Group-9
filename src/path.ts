@@ -1,6 +1,5 @@
 import { Node } from "./graphs";
 import { Pair } from "./list";
-import { Queue } from "./queue_array";
 
 /**
  * A Path is a Array containing the "Path" to a given node.
@@ -10,7 +9,7 @@ import { Queue } from "./queue_array";
  * 
  * Path can be Empty ([]) if no Path to the node was found.
  */
-export type Path = Queue<Node>;
+export type Path = Array<Node>;
 
 
 /**

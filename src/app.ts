@@ -3,14 +3,13 @@ import {
     Maze, deepen_index,
     flatten_index, free, wall, maze_to_listgraph
 } from "./maze";
+import {
+    lg_a_star_path, lg_breadth_first,
+    lg_depth_first, lg_dijkstra_path
+} from "./graphs";
 import { head, is_null, tail } from "./list";
 import { Result, Stream } from "./path";
 import { iterative_maze_generation } from "./maze_generator";
-import { lg_breadth_first } from "./breadth_first";
-import { lg_depth_first } from "./deapth_first";
-import { lg_dijkstra_path } from "./dijkstra";
-import { lg_a_star_path } from "./a_star";
-import { dequeue, is_empty, head as queue_head } from "./queue_array";
 
 const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
@@ -218,9 +217,9 @@ function draw(
         });
 
         // Draw the path taken to reach the current node
-        const path = head(algorithm.algorithm).path_so_far;
-        while (!is_empty(path)) {
-            let pos = deepen_index(queue_head(path), maze);
+        let current_path = head(algorithm.algorithm).path_so_far;
+        current_path.forEach((node) => {
+            let pos = deepen_index(node, maze);
             if (pos !== undefined) {
                 if (head(algorithm.algorithm).is_done) {
                     // grön
@@ -230,8 +229,7 @@ function draw(
                     algorithm.textures[pos.row][pos.col].tint = 0xe8c100;
                 }
             }
-            dequeue(path);
-        }
+        });
 
         // Draw the current node
         let current_node = deepen_index(
