@@ -15,7 +15,7 @@ import { queue_to_array } from "./queue_array";
 const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
 
-const maze: Maze = iterative_maze_generation(10);
+const maze: Maze = iterative_maze_generation(50);
 
 // sometinh ~2 days
 // other [optional] ~3 days
@@ -241,7 +241,8 @@ function draw(
                     algorithm.textures[pos.row][pos.col].tint = 0xe8c100;
                 }
             }
-        });
+            dequeue(path);
+        }
 
         // Mark Current node with purple 0xd534eb
         let current_node = deepen_index(
