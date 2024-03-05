@@ -1,7 +1,7 @@
 import * as pixi from "pixi.js";
 import {
     Maze, deepen_index,
-    flatten_index, free, wall, maze_to_listgraph
+    flatten_index, free, wall, maze_to_listgraph, new_maze
 } from "./maze";
 import { head, is_null, tail } from "./list";
 import { Result, Stream } from "./path";
@@ -15,8 +15,49 @@ import { queue_to_array } from "./queue_array";
 const app = new pixi.Application<HTMLCanvasElement>({ resizeTo: window });
 document.body.appendChild(app.view);
 
-const maze: Maze = iterative_maze_generation(50);
-const steps_per_secound = 20;
+const used = iterative_maze_generation(1, 0, false);
+
+// Good settings found:
+
+/*
+*/
+// all even
+const maze: Maze = iterative_maze_generation(5, 10, true);
+const steps_per_secound = 2;
+const start = undefined;
+const end = undefined;
+
+// dfs bad path
+/*
+const maze: Maze = iterative_maze_generation(5, 0, true);
+const steps_per_secound = 2;
+const start = undefined;
+const end = undefined;
+*/
+
+// A* avoiding bad path
+/*
+const maze: Maze = iterative_maze_generation(5, 23, true);
+const steps_per_secound = 2;
+const start = undefined;
+const end = undefined;
+*/
+
+// A* avoiding bad path on 10 x 10
+/*
+const maze: Maze = iterative_maze_generation(10, 12, true);
+const steps_per_secound = 6;
+const start = undefined;
+const end = undefined;
+*/
+
+// Blank Maze diffrent spawns
+/*
+const maze: Maze = new_maze(10, free);
+const steps_per_secound = 6;
+const start = flatten_index(5, 5, maze);
+const end = flatten_index(8, 8, maze);
+*/
 
 /**
  * Setsup A array of textures representing the maze
@@ -84,7 +125,10 @@ type AlgorithmInstance = {
  * @returns A Array of textures representing the given Maze
  */
 function init_algortihm_array(
-    maze: Maze
+    maze: Maze,
+    start: number | undefined = flatten_index(1, 1, maze),
+    end: number | undefined =
+    flatten_index(maze.width - 2, maze.height - 2, maze)
 ): Array<AlgorithmInstance> {
     const graph = maze_to_listgraph(maze);
     let algorithms: Array<AlgorithmInstance> = [];
@@ -93,9 +137,7 @@ function init_algortihm_array(
     // Create a container holding breadth first
     let container = new pixi.Container();
 
-    let start = flatten_index(1, 1, maze);
     start = start === undefined ? 0 : start;
-    let end = flatten_index(maze.width - 2, maze.height - 2, maze);
     end = end === undefined ? 0 : end;
 
     // Create the record holding textures and the algorithm
@@ -217,7 +259,7 @@ function init_algortihm_array(
 }
 
 
-const algorithms = init_algortihm_array(maze);
+const algorithms = init_algortihm_array(maze, start, end);
 let mili_seconds = 0;
 
 /**
