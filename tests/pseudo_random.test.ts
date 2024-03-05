@@ -7,7 +7,7 @@ test("test randomality", () => {
     for (let run = 0; run < 10000; run++) {
         random_instance.random_bool() ? count_true++ : count_false++;
     }
-    expect(count_true - count_false).toBeLessThan(100);
+    expect(Math.abs(count_true - count_false)).toBeLessThan(100);
 });
 
 test("test randomality of float", () => {
@@ -19,7 +19,7 @@ test("test randomality of float", () => {
             ? greater_than_half++
             : lesser_than_half++;
     }
-    expect(greater_than_half - lesser_than_half).toBeLessThan(100);
+    expect(Math.abs(greater_than_half - lesser_than_half)).toBeLessThan(100);
 });
 
 test("test randomality of int", () => {
@@ -29,7 +29,7 @@ test("test randomality of int", () => {
     for (let run = 0; run < 10000; run++) {
         random_instance.random_int() ? count_true++ : count_false++;
     }
-    expect(count_true - count_false).toBeLessThan(100);
+    expect(Math.abs(count_true - count_false)).toBeLessThan(100);
 });
 
 const max_int32 = 2147483647;
