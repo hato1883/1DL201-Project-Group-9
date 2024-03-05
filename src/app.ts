@@ -27,6 +27,14 @@ const steps_per_secound = 2;
 const start = undefined;
 const end = undefined;
 
+// Random large maze 34 s
+/*
+const maze: Maze = iterative_maze_generation(35, 0, true);
+const steps_per_secound = 1000;
+const start = undefined;
+const end = undefined;
+*/
+
 // dfs bad path
 /*
 const maze: Maze = iterative_maze_generation(5, 0, true);
